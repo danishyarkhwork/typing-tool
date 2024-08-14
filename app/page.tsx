@@ -2,6 +2,7 @@ import { Link } from "@nextui-org/link";
 import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code";
 import { button as buttonStyles } from "@nextui-org/theme";
+import { Image } from "@nextui-org/image";
 
 import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
@@ -22,17 +23,23 @@ export default function Home() {
         </h2>
       </div>
 
+      <Image
+        width={300}
+        alt="NextUI hero Image"
+        src="https://nextui-docs-v2.vercel.app/images/hero-card-complete.jpeg"
+      />
+
       <div className="flex gap-3">
         <Link
           isExternal
           className={buttonStyles({
-            color: "primary",
+            color: "warning",
             radius: "full",
             variant: "shadow",
           })}
           href={siteConfig.links.docs}
         >
-          Documentation
+          Button Test
         </Link>
         <Link
           isExternal
