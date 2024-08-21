@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -22,13 +23,13 @@ export default function Home() {
                   result with your friends.
                 </p>
                 <div className="flex gap-3 mt-8">
-                  <a
+                  <Link
                     href="/typing-test"
                     className="py-3 px-6 rounded border border-primary text-white bg-primary hover:shadow-lg hover:shadow-primary/50 focus:outline focus:outline-primary/50 transition-all duration-500"
                   >
                     <i className="fa-solid fa-bag-shopping me-2"></i> START
                     TYPING TEST
-                  </a>
+                  </Link>
                 </div>
                 <div className="flex flex-wrap items-center gap-5 mt-5">
                   <div className="flex items-center gap-2">
