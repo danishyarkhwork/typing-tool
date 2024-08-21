@@ -10,7 +10,7 @@ const Header = () => {
     <>
       <header
         id="navbar"
-        className="light fixed top-0 inset-x-0 flex items-center z-40 w-full lg:bg-transparent bg-white transition-all py-5"
+        className="light fixed top-0 inset-x-0 flex items-center z-40 w-full bg-white transition-all py-5"
       >
         <div className="container">
           <nav className="flex items-center">
@@ -68,6 +68,36 @@ const Header = () => {
                     <div className="nav-item">
                       <Link className="nav-link" href="contact.html">
                         Custom Typing Test
+                      </Link>
+                    </div>
+                  </div>
+                </li>
+
+                <li className="nav-item">
+                  <a
+                    href="javascript:void(0);"
+                    className="nav-link after:absolute hover:after:-bottom-10 after:inset-0 fc-dropdown"
+                    data-fc-trigger="hover"
+                    data-fc-target="innerPageDropdownMenu2"
+                    data-fc-type="dropdown"
+                    data-fc-placement="bottom"
+                  >
+                    Games{" "}
+                    <i className="fa-solid fa-angle-down ms-2 align-middle"></i>
+                  </a>
+
+                  <div
+                    id="innerPageDropdownMenu2"
+                    style={{ left: "901.922px", top: "58px" }}
+                    className="opacity-0 mt-4 fc-dropdown-open:opacity-100 fc-dropdown-open:translate-y-0 translate-y-3 origin-center transition-all bg-white rounded-lg shadow-lg border p-2 w-48 space-y-1.5 fc-dropdown absolute hidden"
+                  >
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/words-fall-game">
+                        Words Fall Game
+                      </Link>
+
+                      <Link className="nav-link" href="/type-and-destroy-game">
+                        Type & Destroy Game
                       </Link>
                     </div>
                   </div>

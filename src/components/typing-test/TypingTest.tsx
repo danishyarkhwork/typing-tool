@@ -407,8 +407,11 @@ const TypingTest: React.FC = () => {
           </div>
           <div className="mt-4 flex justify-center space-x-4">
             <FacebookShareButton
-              url={shareUrl}
-              quote={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
+              url={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                shareUrl
+              )}&quote=${encodeURIComponent(
+                `I scored ${wpm} WPM with ${accuracy}% accuracy!`
+              )}`}
             >
               <FacebookIcon size={40} round />
             </FacebookShareButton>
