@@ -23,7 +23,7 @@ export default function Home() {
                 </p>
                 <div className="flex gap-3 mt-8">
                   <a
-                    href="#demo"
+                    href="/typing-test"
                     className="py-3 px-6 rounded border border-primary text-white bg-primary hover:shadow-lg hover:shadow-primary/50 focus:outline focus:outline-primary/50 transition-all duration-500"
                   >
                     <i className="fa-solid fa-bag-shopping me-2"></i> START
