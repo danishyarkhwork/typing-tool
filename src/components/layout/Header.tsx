@@ -684,7 +684,7 @@ const Header = () => {
                 target="_blank"
                 className="bg-primary text-white px-4 py-2 rounded inline-flex items-center text-sm"
               >
-                Download
+                Login
               </Link>
             </div>
 
@@ -957,7 +957,7 @@ const Header = () => {
               target="_blank"
               className="bg-primary w-full text-white p-3 rounded flex items-center justify-center text-sm"
             >
-              Download
+              Login
             </Link>
           </div>
         </div>

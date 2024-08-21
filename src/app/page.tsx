@@ -9,27 +9,26 @@ export default function Home() {
             <div className="order-2 lg:order-1">
               <div className="text-center sm:text-start">
                 <h1 className="text-3xl/tight sm:text-4xl/tight lg:text-5xl/tight font-semibold mb-7">
-                  The best way to
+                  Test & Improve your{" "}
                   <span className="relative z-0 after:bg-green-500/50 after:-z-10 after:absolute md:after:h-6 after:h-4 after:w-full after:bottom-0 after:end-0">
-                    showcase
+                    Typing Speed{" "}
                   </span>
-                  your saas
+                  with our free Typing Games
                 </h1>
                 <p className="sm:text-lg text-gray-500">
-                  Make your saas application stand out with high-quality landing
-                  page designed and developed by professional
+                  If you want a quick way to test your typing speed, try out our
+                  1-minute free Typing test (available in over 10 languages).
+                  You can quickly see how fast you can type and compare your
+                  result with your friends.
                 </p>
-                <div className="flex gap-3 mt-16">
-                  <input
-                    type="email"
-                    className="inline-block text-sm border border-slate-300 focus:ring-0 rounded shadow-lg sm:shadow-none bg-white w-full py-3"
-                    id="Email"
-                    aria-describedby="emailHelp"
-                    placeholder="Your Email"
-                  />
-                  <button className="bg-primary text-white rounded-lg text-sm font-semibold flex-none hover:shadow-lg hover:shadow-primary/30 focus:shadow-none focus:outline focus:outline-primary/40 px-3">
-                    Sign Up
-                  </button>
+                <div className="flex gap-3 mt-8">
+                  <a
+                    href="#demo"
+                    className="py-3 px-6 rounded border border-primary text-white bg-primary hover:shadow-lg hover:shadow-primary/50 focus:outline focus:outline-primary/50 transition-all duration-500"
+                  >
+                    <i className="fa-solid fa-bag-shopping me-2"></i> START
+                    TYPING TEST
+                  </a>
                 </div>
                 <div className="flex flex-wrap items-center gap-5 mt-5">
                   <div className="flex items-center gap-2">
