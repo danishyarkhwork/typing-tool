@@ -1,139 +1,200 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  WhatsappIcon,
+} from "react-share";
 
-const easyWords = [
-  "cat",
-  "dog",
-  "book",
-  "house",
-  "car",
-  "tree",
-  "apple",
-  "happy",
-  "run",
-  "jump",
-  "play",
-  "walk",
-  "sun",
-  "moon",
-  "star",
-  "blue",
-  "red",
-  "green",
-  "yellow",
-  "big",
-  "small",
-  "fast",
-  "slow",
-  "hot",
-  "cold",
-  "new",
-  "old",
-  "good",
-  "bad",
-  "yes",
-  "no",
-  "and",
-  "or",
-  "but",
-  "if",
-  "the",
-  "is",
-  "in",
-  "on",
-  "it",
-  "to",
-  "he",
-  "she",
-];
+// Define type for languageWords
+type WordLists = {
+  easy: string[];
+  medium: string[];
+  complex: string[];
+};
 
-const mediumWords = [
-  "beautiful",
-  "quickly",
-  "understand",
-  "bicycle",
-  "mountain",
-  "kitchen",
-  "elephant",
-  "conversation",
-  "puzzle",
-  "garden",
-  "window",
-  "holiday",
-  "balloon",
-  "umbrella",
-  "yesterday",
-  "tomorrow",
-  "library",
-  "excited",
-  "adventure",
-  "enormous",
-  "delicious",
-  "whisper",
-  "thunder",
-  "river",
-  "ocean",
-  "sandwich",
-  "butterfly",
-  "treasure",
-  "important",
-  "remember",
-  "family",
-  "friend",
-  "happy",
-  "lucky",
-  "quiet",
-  "loud",
-  "perfect",
-  "wonderful",
-  "knowledge",
-  "curious",
-];
+type Languages = {
+  english: WordLists;
+  pashto: WordLists;
+};
 
-const complexWords = [
-  "extraterrestrial",
-  "metamorphosis",
-  "quantum",
-  "psychology",
-  "philosophy",
-  "anthropology",
-  "astronomy",
-  "biochemistry",
-  "neuroscience",
-  "microbiology",
-  "paleontology",
-  "epistemology",
-  "sociolinguistics",
-  "hydrodynamics",
-  "thermodynamics",
-  "photosynthesis",
-  "electromagnetism",
-  "cybersecurity",
-  "cryptography",
-  "nanotechnology",
-  "biotechnology",
-  "astrobiology",
-  "astrophysics",
-  "geophysics",
-  "quantum mechanics",
-  "relativity",
-  "string theory",
-  "superconductivity",
-  "bioinformatics",
-  "biostatistics",
-  "neuropsychology",
-  "psychopharmacology",
-  "epidemiology",
-  "virology",
-  "immunology",
-  "pathophysiology",
-  "histopathology",
-  "psychopathology",
-  "parapsychology",
-  "metaphysics",
-  "hermeneutics",
-];
+// Language word lists
+const languageWords: Languages = {
+  english: {
+    easy: [
+      "cat",
+      "dog",
+      "book",
+      "house",
+      "car",
+      "tree",
+      "apple",
+      "happy",
+      "run",
+      "jump",
+      "play",
+      "walk",
+      "sun",
+      "moon",
+      "star",
+      "blue",
+      "red",
+      "green",
+      "yellow",
+      "big",
+      "small",
+      "fast",
+      "slow",
+      "hot",
+      "cold",
+      "new",
+      "old",
+      "good",
+      "bad",
+      "yes",
+      "no",
+      "and",
+      "or",
+      "but",
+      "if",
+      "the",
+      "is",
+      "in",
+      "on",
+      "it",
+      "to",
+      "he",
+      "she",
+    ],
+    medium: [
+      "beautiful",
+      "quickly",
+      "understand",
+      "bicycle",
+      "mountain",
+      "kitchen",
+      "elephant",
+      "conversation",
+      "puzzle",
+      "garden",
+      "window",
+      "holiday",
+      "balloon",
+      "umbrella",
+      "yesterday",
+      "tomorrow",
+      "library",
+      "excited",
+      "adventure",
+      "enormous",
+      "delicious",
+      "whisper",
+      "thunder",
+      "river",
+      "ocean",
+      "sandwich",
+      "butterfly",
+      "treasure",
+      "important",
+      "remember",
+      "family",
+      "friend",
+      "happy",
+      "lucky",
+      "quiet",
+      "loud",
+      "perfect",
+      "wonderful",
+      "knowledge",
+      "curious",
+    ],
+    complex: [
+      "extraterrestrial",
+      "metamorphosis",
+      "quantum",
+      "psychology",
+      "philosophy",
+      "anthropology",
+      "astronomy",
+      "biochemistry",
+      "neuroscience",
+      "microbiology",
+      "paleontology",
+      "epistemology",
+      "sociolinguistics",
+      "hydrodynamics",
+      "thermodynamics",
+      "photosynthesis",
+      "electromagnetism",
+      "cybersecurity",
+      "cryptography",
+      "nanotechnology",
+      "biotechnology",
+      "astrobiology",
+      "astrophysics",
+      "geophysics",
+      "quantum mechanics",
+      "relativity",
+      "string theory",
+      "superconductivity",
+      "bioinformatics",
+      "biostatistics",
+      "neuropsychology",
+      "psychopharmacology",
+      "epidemiology",
+      "virology",
+      "immunology",
+      "pathophysiology",
+      "histopathology",
+      "psychopathology",
+      "parapsychology",
+      "metaphysics",
+      "hermeneutics",
+    ],
+  },
+  pashto: {
+    easy: [
+      "کتاب",
+      "کور",
+      "موټر",
+      "سیب",
+      "لوی",
+      "خوشحاله",
+      "منډه",
+      "ټوپ",
+      "لوبه",
+      //... other easy Pashto words
+    ],
+    medium: [
+      "ښکلی",
+      "ګړندی",
+      "پوهیدل",
+      "بایسکل",
+      "غر",
+      "پخلنځی",
+      "پيل",
+      "خبره",
+      //... other medium Pashto words
+    ],
+    complex: [
+      "فلسفه",
+      "انسان پېژندنه",
+      "ساینس",
+      "نفس پوهه",
+      "هیدرودینامیک",
+      "ژبپوهنه",
+      "الکترومقناطیس",
+      "پراسرار",
+      "فوق العاده",
+      "زیږنتون",
+      //... other complex Pashto words
+    ],
+  },
+};
 
 const generateRandomWords = (num: number, wordList: string[]) => {
   return Array.from(
@@ -161,13 +222,14 @@ const TypingTest: React.FC = () => {
     { wpm: number; accuracy: number }[]
   >([]);
   const [difficulty, setDifficulty] = useState("easy");
+  const [language, setLanguage] = useState("english");
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const wordsPerPage = 20;
 
   useEffect(() => {
-    setText(generateRandomWords(100, getWordList(difficulty)));
-  }, [difficulty]);
+    setText(generateRandomWords(100, getWordList(difficulty, language)));
+  }, [difficulty, language]);
 
   useEffect(() => {
     if (isTyping && timeLeft > 0) {
@@ -246,7 +308,7 @@ const TypingTest: React.FC = () => {
   };
 
   const handleRestart = () => {
-    setText(generateRandomWords(100, getWordList(difficulty)));
+    setText(generateRandomWords(100, getWordList(difficulty, language)));
     setInput("");
     setIsTyping(false);
     setTimeLeft(selectedTime);
@@ -268,20 +330,21 @@ const TypingTest: React.FC = () => {
     setDifficulty(e.target.value);
   };
 
-  const getWordList = (difficulty: string) => {
-    switch (difficulty) {
-      case "medium":
-        return mediumWords;
-      case "complex":
-        return complexWords;
-      default:
-        return easyWords;
-    }
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(e.target.value);
+  };
+
+  const getWordList = (difficulty: string, language: string) => {
+    return languageWords[language as keyof Languages][
+      difficulty as keyof WordLists
+    ];
   };
 
   useEffect(() => {
     highlightNextWord("");
   }, [typedWords, currentIndex]);
+
+  const shareUrl = window.location.href;
 
   return (
     <div className="p-6 max-w-6xl mx-auto my-8 bg-white rounded-xl shadow-lg space-y-6">
@@ -295,6 +358,7 @@ const TypingTest: React.FC = () => {
           <option value={60}>60 seconds</option>
           <option value={120}>120 seconds</option>
         </select>
+
         <select
           value={difficulty}
           onChange={handleDifficultyChange}
@@ -304,6 +368,17 @@ const TypingTest: React.FC = () => {
           <option value="medium">Medium</option>
           <option value="complex">Complex</option>
         </select>
+
+        <select
+          value={language}
+          onChange={handleLanguageChange}
+          className="p-2 border border-gray-300 rounded"
+        >
+          <option value="english">English</option>
+          <option value="pashto">Pashto</option>
+          {/* Add more languages as needed */}
+        </select>
+
         <button
           onClick={handleRestart}
           className="p-2 bg-blue-500 text-white rounded shadow"
@@ -311,6 +386,7 @@ const TypingTest: React.FC = () => {
           Restart
         </button>
       </div>
+
       {timeLeft === 0 ? (
         <div className="text-center space-y-4">
           <div className="text-5xl font-bold text-green-500">{wpm} WPM</div>
@@ -329,12 +405,35 @@ const TypingTest: React.FC = () => {
           <div className="text-2xl">
             Wrong words: <span className="text-red-500">{errors}</span>
           </div>
+          <div className="mt-4 flex justify-center space-x-4">
+            <FacebookShareButton
+              url={shareUrl}
+              quote={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
+            >
+              <FacebookIcon size={40} round />
+            </FacebookShareButton>
+            <TwitterShareButton
+              url={shareUrl}
+              title={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
+            >
+              <TwitterIcon size={40} round />
+            </TwitterShareButton>
+            <WhatsappShareButton
+              url={shareUrl}
+              title={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
+            >
+              <WhatsappIcon size={40} round />
+            </WhatsappShareButton>
+          </div>
         </div>
       ) : (
         <>
           <div
             id="words"
-            className="text-4xl font-semibold whitespace-pre-wrap leading-relaxed tracking-wide"
+            className={`text-4xl font-semibold whitespace-pre-wrap leading-relaxed tracking-wide ${
+              language === "pashto" ? "text-right" : "text-left"
+            }`}
+            dir={language === "pashto" ? "rtl" : "ltr"}
             ref={textRef}
           >
             {text.slice(0, currentIndex + wordsPerPage).map((word, index) => {
@@ -364,11 +463,19 @@ const TypingTest: React.FC = () => {
             type="text"
             value={input}
             onChange={handleChange}
-            className="w-full p-3 mt-4 border border-gray-300 rounded text-4xl"
-            placeholder="Start typing here..."
+            className={`w-full p-3 mt-4 border border-gray-300 rounded text-4xl ${
+              language === "pashto" ? "text-right" : "text-left"
+            }`}
+            placeholder={
+              language === "pashto"
+                ? "دلته ټایپ کول پیل کړئ ..."
+                : "Start typing here..."
+            }
             disabled={timeLeft === 0}
+            dir={language === "pashto" ? "rtl" : "ltr"}
             autoFocus
           />
+
           <div className="flex justify-between items-center text-gray-900 mt-4">
             <div className="text-2xl">Time Left: {timeLeft}s</div>
             {wpm !== null && <div className="text-2xl">WPM: {wpm}</div>}
