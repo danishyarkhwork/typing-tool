@@ -7,11 +7,27 @@ import Confetti from "react-confetti";
 import useSound from "use-sound";
 
 const textSamples = {
-  english: `Oil and water don't mix. You have probably heard this old saying. It isn't just folk wisdom, however. It's chemistry. Another common expression, "like water off of a duck's back," illustrates the same basic principle.`,
-  pashto: `تیل او اوبه یوځای نشي. تاسو به شاید دا زوړ خبره اورېدلې وي. دا یوازې ولسي حکمت نه دی، بلکې دا کیمیا ده. بله عامه وینا، "لکه څنګه چې اوبه د وزې څخه د غوړېدلې شوې اوبه،" ورته اساسي اصول څرګندوي.`,
+  easy: {
+    english: `The cat sat on the mat.`,
+    pashto: `پشۍ په توشک ناست و.`,
+  },
+  medium: {
+    english: `Oil and water don't mix. You have probably heard this old saying.`,
+    pashto: `تیل او اوبه یوځای نشي. تاسو به شاید دا زوړ خبره اورېدلې وي.`,
+  },
+  hard: {
+    english: `Oil and water don't mix. You have probably heard this old saying. It isn't just folk wisdom, however. It's chemistry. Another common expression, "like water off of a duck's back," illustrates the same basic principle.`,
+    pashto: `تیل او اوبه یوځای نشي. تاسو به شاید دا زوړ خبره اورېدلې وي. دا یوازې ولسي حکمت نه دی، بلکې دا کیمیا ده. بله عامه وینا، "لکه څنګه چې اوبه د وزې څخه د غوړېدلې شوې اوبه،" ورته اساسي اصول څرګندوي.`,
+  },
 };
 
-const TypingTestEnhanced = () => {
+const pashtoKeyboard = {
+  row1: "ض ص ث ق ف غ ع ه خ ح ج چ".split(" "),
+  row2: "ش س ی ب ل ا ت ن م ک گ".split(" "),
+  row3: "ط ظ ز ژ ږ پ و ۍ د ر ذ".split(" "),
+};
+
+const AdvanceTypingTest = () => {
   const [input, setInput] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [correctWords, setCorrectWords] = useState<string[]>([]);
@@ -35,10 +51,10 @@ const TypingTestEnhanced = () => {
 
   useEffect(() => {
     if (showSettings) return;
-    const selectedText = textSamples[language];
+    const selectedText = textSamples[difficulty][language];
     setWords(selectedText.split(" "));
     setCurrentWord(selectedText.split(" ")[0]);
-  }, [language, showSettings]);
+  }, [language, difficulty, showSettings]);
 
   useEffect(() => {
     if (isTyping) {
@@ -62,13 +78,13 @@ const TypingTestEnhanced = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInput(value);
-    playTypingSound();
 
     if (!isTyping) {
       setIsTyping(true);
     }
 
     if (value.trim() === currentWord) {
+      playTypingSound();
       setCorrectWords([...correctWords, currentWord]);
       setInput("");
       setWordIndex((prev) => prev + 1);
@@ -159,12 +175,17 @@ const TypingTestEnhanced = () => {
   };
 
   const renderKeyboard = () => {
+    if (!currentWord) return null;
+
     const nextChar = currentWord.charAt(input.length);
     const isUpperCase = nextChar === nextChar.toUpperCase();
 
-    const keysRow1 = "QWERTYUIOP".split("");
-    const keysRow2 = "ASDFGHJKL".split("");
-    const keysRow3 = "ZXCVBNM".split("");
+    const keysRow1 =
+      language === "pashto" ? pashtoKeyboard.row1 : "QWERTYUIOP".split("");
+    const keysRow2 =
+      language === "pashto" ? pashtoKeyboard.row2 : "ASDFGHJKL".split("");
+    const keysRow3 =
+      language === "pashto" ? pashtoKeyboard.row3 : "ZXCVBNM".split("");
 
     const renderKeys = (keys: string[]) => {
       return keys.map((key) => {
@@ -202,7 +223,7 @@ const TypingTestEnhanced = () => {
     <div
       className={`h-screen w-full flex flex-col justify-center items-center ${
         darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-      } p-8 transition-all duration-300`}
+      } p-8 transition-all duration-300 ${language === "pashto" ? "rtl" : ""}`}
       onClick={() => inputRef.current?.focus()}
     >
       {showSettings ? (
@@ -253,9 +274,10 @@ const TypingTestEnhanced = () => {
           <div
             className={`${
               darkMode ? "bg-gray-800" : "bg-white"
-            } shadow-lg rounded-lg p-6 w-full max-w-4xl overflow-auto h-[300px] transition-all duration-300`}
+            } shadow-lg rounded-lg p-4 w-full max-w-5xl mt-20 overflow-auto h-[300px] transition-all duration-300`}
+            style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
           >
-            <div className="text-2xl leading-relaxed flex flex-wrap font-mono">
+            <div className="text-2xl  flex flex-wrap font-mono">
               {renderText()}
             </div>
           </div>
@@ -268,10 +290,15 @@ const TypingTestEnhanced = () => {
                 ? "bg-gray-800 border-gray-600 text-white"
                 : "border-gray-300 text-black"
             } rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300`}
-            placeholder="Start typing here..."
+            placeholder={
+              language === "pashto"
+                ? "دلته لیکل پیل کړئ..."
+                : "Start typing here..."
+            }
             ref={inputRef}
             autoFocus
             disabled={isCompleted}
+            style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
           />
 
           <div className="w-full max-w-4xl h-2 bg-gray-300 rounded mt-2">
@@ -283,7 +310,7 @@ const TypingTestEnhanced = () => {
 
           {renderKeyboard()}
 
-          <div className="mt-6 w-full max-w-4xl text-lg">
+          <div className="mt-6 w-full max-w-5xl text-lg">
             <div className="flex justify-between">
               <p>Time: {timer}s</p>
               <p>WPM: {wpm}</p>
@@ -292,13 +319,7 @@ const TypingTestEnhanced = () => {
             </div>
           </div>
 
-          <div className="flex justify-between items-center w-full max-w-4xl mt-6">
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 bg-yellow-400 rounded-lg shadow-lg hover:bg-yellow-500 transition duration-300"
-            >
-              Toggle {darkMode ? "Light" : "Dark"} Mode
-            </button>
+          <div className="flex justify-between items-center w-full max-w-4xl mt-4">
             {isCompleted && (
               <button
                 onClick={restartTest}
@@ -320,4 +341,4 @@ const TypingTestEnhanced = () => {
   );
 };
 
-export default TypingTestEnhanced;
+export default AdvanceTypingTest;

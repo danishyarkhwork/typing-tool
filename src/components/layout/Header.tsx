@@ -60,14 +60,8 @@ const Header = () => {
                     </div>
 
                     <div className="nav-item">
-                      <Link className="nav-link" href="contact.html">
+                      <Link className="nav-link" href="/advance-typing-test">
                         Advanced Test
-                      </Link>
-                    </div>
-
-                    <div className="nav-item">
-                      <Link className="nav-link" href="contact.html">
-                        Custom Typing Test
                       </Link>
                     </div>
                   </div>
@@ -106,12 +100,6 @@ const Header = () => {
                     <div className="nav-item">
                       <Link className="nav-link" href="/typing-speed-ai">
                         Typing Speed AI
-                      </Link>
-                    </div>
-
-                    <div className="nav-item">
-                      <Link className="nav-link" href="/typing-conqueror">
-                        Typing Conqueror
                       </Link>
                     </div>
                   </div>
