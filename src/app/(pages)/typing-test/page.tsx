@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const TypingTestPage = () => {
   return (
     <>
-      <section className="bg-gradient-to-b from-blue-500 via-slate-200 to-slate-50 text-black min-h-screen relative pt-24 pb-12">
+      <section className="bg-gray-800 text-black min-h-screen relative pt-24 pb-12">
         <TypingTest />
       </section>
     </>

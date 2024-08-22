@@ -95,9 +95,23 @@ const Header = () => {
                       <Link className="nav-link" href="/words-fall-game">
                         Words Fall Game
                       </Link>
+                    </div>
 
+                    <div className="nav-item">
                       <Link className="nav-link" href="/type-and-destroy-game">
-                        Type & Destroy Game
+                        Type & Destroy
+                      </Link>
+                    </div>
+
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/typing-speed-ai">
+                        Typing Speed AI
+                      </Link>
+                    </div>
+
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/typing-conqueror">
+                        Typing Conqueror
                       </Link>
                     </div>
                   </div>
