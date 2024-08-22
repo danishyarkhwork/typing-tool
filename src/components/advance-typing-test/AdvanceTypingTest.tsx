@@ -47,7 +47,7 @@ const AdvanceTypingTest = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [playTypingSound] = useSound("/typing-sound.mp3", { volume: 0.5 });
+  const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
 
   useEffect(() => {
     if (showSettings) return;
@@ -60,7 +60,6 @@ const AdvanceTypingTest = () => {
     if (isTyping) {
       intervalRef.current = setInterval(() => {
         setTimer((prev) => prev + 1);
-        calculateWpm();
       }, 1000);
     }
     return () => {
@@ -72,11 +71,17 @@ const AdvanceTypingTest = () => {
     if (isCompleted) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       calculateAchievements();
+    } else {
+      calculateWpm(); // Moved the WPM calculation to ensure it's updated frequently
     }
-  }, [isCompleted]);
+  }, [isCompleted, correctWords.length]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+
+    // Play the typing sound on every key press
+    playTypingSound();
+
     setInput(value);
 
     if (!isTyping) {
@@ -84,7 +89,6 @@ const AdvanceTypingTest = () => {
     }
 
     if (value.trim() === currentWord) {
-      playTypingSound();
       setCorrectWords([...correctWords, currentWord]);
       setInput("");
       setWordIndex((prev) => prev + 1);
@@ -151,11 +155,12 @@ const AdvanceTypingTest = () => {
       return (
         <span
           key={index}
-          className={`mx-1 p-1 rounded ${
+          className={`mx-1 p-1 rounded leading-relaxed mb-2 ${
+            // Added leading-relaxed and mb-2 classes
             isCorrect
               ? "bg-green-300 text-white"
               : isCurrentWord
-              ? "bg-blue-500 text-white"
+              ? "bg-blue-300 text-white" // Changed to lighter blue
               : "text-gray-600"
           }`}
         >
@@ -274,22 +279,23 @@ const AdvanceTypingTest = () => {
           <div
             className={`${
               darkMode ? "bg-gray-800" : "bg-white"
-            } shadow-lg rounded-lg p-4 w-full max-w-5xl mt-20 overflow-auto h-[300px] transition-all duration-300`}
+            } shadow-lg rounded-lg p-4 w-full max-w-5xl mt-20 overflow-auto transition-all duration-300`}
             style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
           >
-            <div className="text-2xl  flex flex-wrap font-mono">
+            <div className="text-2xl flex flex-wrap font-mono leading-relaxed">
               {renderText()}
             </div>
           </div>
+
           <input
             type="text"
             value={input}
             onChange={handleChange}
-            className={`mt-4 p-3 text-xl border-2 ${
+            className={`mt-4 p-4 text-2xl border-2 ${
               darkMode
                 ? "bg-gray-800 border-gray-600 text-white"
                 : "border-gray-300 text-black"
-            } rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300`}
+            } rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono`} // Updated input font style and size
             placeholder={
               language === "pashto"
                 ? "دلته لیکل پیل کړئ..."
@@ -310,7 +316,7 @@ const AdvanceTypingTest = () => {
 
           {renderKeyboard()}
 
-          <div className="mt-6 w-full max-w-5xl text-lg">
+          <div className="mt-10 w-full max-w-5xl text-lg mt-10">
             <div className="flex justify-between">
               <p>Time: {timer}s</p>
               <p>WPM: {wpm}</p>
@@ -319,20 +325,15 @@ const AdvanceTypingTest = () => {
             </div>
           </div>
 
-          <div className="flex justify-between items-center w-full max-w-4xl mt-4">
-            {isCompleted && (
+          {isCompleted && (
+            <div className="mt-8 text-center">
+              <h2 className="text-3xl mt-10 font-bold">{achievement}</h2>
               <button
                 onClick={restartTest}
-                className="p-2 bg-blue-600 rounded-lg text-white shadow-lg hover:bg-blue-700 transition duration-300"
+                className="mt-10 p-3 bg-blue-600 text-lg rounded-lg text-white shadow-lg hover:bg-blue-700 transition duration-300"
               >
                 Restart Test
               </button>
-            )}
-          </div>
-
-          {isCompleted && (
-            <div className="mt-8 text-center">
-              <h2 className="text-3xl font-bold">{achievement}</h2>
             </div>
           )}
         </>
