@@ -378,7 +378,7 @@ const TypingTest: React.FC = () => {
   const shareUrl = window.location.href;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto my-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg space-y-8">
+    <div className="p-6 max-w-5xl mx-auto my-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg space-y-8">
       <div className="flex justify-between items-center mb-6">
         <div className="flex space-x-4">
           <select

@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useRef, memo } from "react";
 import { nanoid } from "nanoid";
+import useSound from "use-sound";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 
 const sentenceLists = {
   english: {
@@ -74,6 +77,10 @@ const TypingRaceGame: React.FC = () => {
 
   const startTimeRef = useRef<number | null>(null);
   const aiIntervalRefs = useRef<Record<string, NodeJS.Timeout | null>>({});
+
+  const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 }); // Add typing sound
+
+  const { width, height } = useWindowSize(); // For confetti size
 
   useEffect(() => {
     if (isPlaying) {
@@ -169,6 +176,9 @@ const TypingRaceGame: React.FC = () => {
     const value = e.target.value;
     setInput(value);
 
+    // Play the typing sound on every key press
+    playTypingSound();
+
     if (currentSentence) {
       const correctText = currentSentence.sentence.substring(0, value.length);
       if (value === correctText) {
@@ -185,71 +195,82 @@ const TypingRaceGame: React.FC = () => {
   };
 
   return (
-    <div className="game-container max-w-4xl mx-auto p-8 bg-gray-900 text-white rounded-lg shadow-lg space-y-8">
+    <div
+      className={`game-container max-w-4xl mx-auto p-8 rounded-lg shadow-lg space-y-8 ${
+        language === "pashto" ? "text-right" : "text-left"
+      } ${
+        language === "pashto" ? "rtl" : ""
+      } bg-white text-gray-900 transition-all duration-300`}
+    >
       {!isPlaying && !gameOver && (
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-6">Typing Race with AI</h1>
-          <p className="text-lg mb-4">
-            Race against AI competitors and test your typing speed!
-          </p>
-          <div className="flex justify-center space-x-4">
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="p-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white"
+        <>
+          <header className="text-center mb-12">
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+              Test Your Typing Speed Against AI Competitors
+            </h1>
+            <p className="text-lg text-gray-700">
+              Take the challenge and race against AI to improve your typing
+              speed and accuracy.
+            </p>
+          </header>
+          <div className="text-center">
+            <div className="flex justify-center space-x-4 mb-6">
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="p-3 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900"
+              >
+                <option value="english">English</option>
+                <option value="pashto">Pashto</option>
+              </select>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+                className="p-3 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900"
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <button
+              onClick={handleStart}
+              className="mt-6 p-4 bg-blue-600 rounded-lg text-white shadow-lg hover:bg-blue-700 transition duration
+-300"
             >
-              <option value="english">English</option>
-              <option value="pashto">Pashto</option>
-            </select>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="p-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white"
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
+              Start Race
+            </button>
           </div>
-          <button
-            onClick={handleStart}
-            className="mt-6 p-4 bg-blue-600 rounded-lg text-white shadow-lg hover:bg-blue-700 transition duration-300"
-          >
-            Start Race
-          </button>
-        </div>
-      )}
-
+        </>
+      )}{" "}
       {gameOver && (
         <div className="text-center">
+          <Confetti width={width} height={height} />
           <h2 className="text-4xl font-bold mb-4">
             {winner === "You" ? "Congratulations! You won!" : `${winner} wins!`}
           </h2>
           <p className="text-lg">Your WPM: {calculateWPM().toFixed(2)}</p>
           <button
             onClick={handleStart}
-            className="p-4 bg-blue-600 rounded-lg text-white shadow-lg hover:bg-blue-700 transition duration-300"
+            className="mt-6 p-4 bg-blue-600 rounded-lg text-white shadow-lg hover:bg-blue-700 transition duration-300"
           >
             Play Again
           </button>
         </div>
       )}
-
       {isPlaying && !gameOver && currentSentence && (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="text-lg">
-              Player Progress: {playerProgress.toFixed(2)}%
-            </div>
-            <div className="text-lg">
+          <div className="flex justify-between items-center text-lg">
+            <div>Player Progress: {playerProgress.toFixed(2)}%</div>
+            <div>
               Timer:{" "}
               {((Date.now() - (startTimeRef.current || 0)) / 1000).toFixed(1)}s
             </div>
           </div>
           <div
-            className={`text-2xl bg-gray-800 p-4 rounded-lg shadow-md leading-relaxed ${
+            className={`text-2xl p-4 rounded-lg shadow-md leading-relaxed ${
               language === "pashto" ? "text-right" : "text-left"
-            }`}
+            } bg-gray-100`}
             dir={language === "pashto" ? "rtl" : "ltr"}
           >
             {currentSentence.sentence.split("").map((char, idx) => (
@@ -257,10 +278,10 @@ const TypingRaceGame: React.FC = () => {
                 key={idx}
                 className={`${
                   input[idx] === char
-                    ? "text-green-400"
+                    ? "text-green-600"
                     : input[idx]
                     ? "text-red-500"
-                    : "text-gray-400"
+                    : "text-gray-500"
                 }`}
               >
                 {char}
@@ -271,7 +292,7 @@ const TypingRaceGame: React.FC = () => {
             type="text"
             value={input}
             onChange={handleChange}
-            className={`w-full p-4 bg-white border-2 border-gray-600 rounded-lg text-xl text-black focus:outline-none focus:border-blue-500 ${
+            className={`w-full p-4 bg-white border-2 border-gray-300 rounded-lg text-xl text-black focus:outline-none focus:border-blue-500 ${
               language === "pashto" ? "text-right" : "text-left"
             }`}
             placeholder={
@@ -292,7 +313,7 @@ const TypingRaceGame: React.FC = () => {
                   <span>{ai.name}</span>
                   <span>{(aiProgress[ai.name] || 0).toFixed(2)}%</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-lg h-2">
+                <div className="w-full bg-gray-300 rounded-lg h-2">
                   <div
                     className="bg-red-500 h-2 rounded-lg"
                     style={{ width: `${aiProgress[ai.name] || 0}%` }}
@@ -303,7 +324,7 @@ const TypingRaceGame: React.FC = () => {
           </div>
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-2">Your Progress:</h3>
-            <div className="w-full bg-gray-700 rounded-lg h-2">
+            <div className="w-full bg-gray-300 rounded-lg h-2">
               <div
                 className="bg-blue-500 h-2 rounded-lg"
                 style={{ width: `${playerProgress}%` }}

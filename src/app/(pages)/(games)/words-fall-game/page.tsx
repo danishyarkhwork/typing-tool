@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const WordFallGamePage = () => {
   return (
     <>
-      <section className="bg-gradient-to-b from-blue-500 via-slate-200 to-slate-50 text-black min-h-screen relative pt-18 pb-12">
+      <section className="">
         <WordFallGame />
       </section>
     </>

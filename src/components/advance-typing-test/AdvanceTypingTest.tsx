@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
 import Confetti from "react-confetti";
 import useSound from "use-sound";
+import { useWindowSize } from "react-use";
 
 const textSamples = {
   easy: {
@@ -39,7 +38,6 @@ const AdvanceTypingTest = () => {
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState("english");
   const [difficulty, setDifficulty] = useState("medium");
   const [showSettings, setShowSettings] = useState(true);
@@ -48,6 +46,7 @@ const AdvanceTypingTest = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
+  const { width, height } = useWindowSize();
 
   useEffect(() => {
     if (showSettings) return;
@@ -72,16 +71,14 @@ const AdvanceTypingTest = () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       calculateAchievements();
     } else {
-      calculateWpm(); // Moved the WPM calculation to ensure it's updated frequently
+      calculateWpm();
     }
   }, [isCompleted, correctWords.length]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    // Play the typing sound on every key press
     playTypingSound();
-
     setInput(value);
 
     if (!isTyping) {
@@ -156,11 +153,10 @@ const AdvanceTypingTest = () => {
         <span
           key={index}
           className={`mx-1 p-1 rounded leading-relaxed mb-2 ${
-            // Added leading-relaxed and mb-2 classes
             isCorrect
-              ? "bg-green-500 text-white" // Slightly brighter green for modern look
+              ? "bg-green-500 text-white"
               : isCurrentWord
-              ? "bg-blue-500 text-white" // Changed to consistent blue
+              ? "bg-blue-500 text-white"
               : "text-gray-600"
           }`}
         >
@@ -173,10 +169,6 @@ const AdvanceTypingTest = () => {
   const startGame = () => {
     setShowSettings(false);
     setIsTyping(false);
-  };
-
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
   };
 
   const renderKeyboard = () => {
@@ -205,7 +197,7 @@ const AdvanceTypingTest = () => {
               isActive
                 ? "bg-blue-700 text-white"
                 : isNextKey
-                ? "bg-yellow-500 text-white animate-pulse" // Updated to a brighter yellow
+                ? "bg-yellow-500 text-white animate-pulse"
                 : "bg-gray-300 text-black"
             }`}
           >
@@ -226,60 +218,64 @@ const AdvanceTypingTest = () => {
 
   return (
     <div
-      className={`h-screen w-full flex flex-col justify-center items-center ${
-        darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-      } p-8 transition-all duration-300 ${language === "pashto" ? "rtl" : ""}`}
+      className={`max-w-5xl flex flex-col justify-center text-gray-900 transition-all duration-300 ${
+        language === "pashto" ? "rtl" : ""
+      }`}
       onClick={() => inputRef.current?.focus()}
     >
       {showSettings ? (
-        <div className="settings w-full max-w-lg p-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-          <h2 className="text-3xl font-bold mb-6">Typing Game Settings</h2>
-          <div className="mb-4">
-            <label className="block mb-2 text-lg">Select Language:</label>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full p-3 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-            >
-              <option value="english">English</option>
-              <option value="pashto">Pashto</option>
-            </select>
+        <>
+          <header className="text-center mb-10 mt-6">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Advanced Typing Test Tool
+            </h1>
+            <p className="text-lg text-gray-700">
+              Push your typing skills to the limit with our advanced test.
+              Perfect for improving speed, accuracy, and consistency.
+            </p>
+          </header>
+          <div className="flex items-center justify-center text-gray-900">
+            <div className="settings w-full max-w-lg p-8 bg-white shadow-lg rounded-lg">
+              <h2 className="text-3xl font-bold mb-6 text-center">
+                Typing Game Settings
+              </h2>
+              <div className="mb-4">
+                <label className="block mb-2 text-lg">Select Language:</label>
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="w-full p-3 rounded bg-gray-200 text-gray-900"
+                >
+                  <option value="english">English</option>
+                  <option value="pashto">Pashto</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block mb-2 text-lg">Select Difficulty:</label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  className="w-full p-3 rounded bg-gray-200 text-gray-900"
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+              <button
+                onClick={startGame}
+                className="w-full p-4 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
+              >
+                Start Game
+              </button>
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-lg">Select Difficulty:</label>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full p-3 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-lg">Select Theme:</label>
-            <button
-              onClick={toggleDarkMode}
-              className="w-full p-3 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-            >
-              {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            </button>
-          </div>
-          <button
-            onClick={startGame}
-            className="w-full p-4 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
-          >
-            Start Game
-          </button>
-        </div>
+        </>
       ) : (
         <>
-          {isCompleted && <Confetti />}
+          {isCompleted && <Confetti width={width} height={height} />}
           <div
-            className={`${
-              darkMode ? "bg-gray-800" : "bg-white"
-            } shadow-lg rounded-lg p-4 w-full max-w-5xl mt-20 overflow-auto transition-all duration-300`}
+            className="bg-white shadow-lg mt-6 rounded-lg p-4 w-full max-w-6xl overflow-auto transition-all duration-300"
             style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
           >
             <div className="text-2xl flex flex-wrap font-mono leading-relaxed">
@@ -291,11 +287,7 @@ const AdvanceTypingTest = () => {
             type="text"
             value={input}
             onChange={handleChange}
-            className={`mt-4 p-4 text-2xl border-2 ${
-              darkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "border-gray-300 text-black"
-            } rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono`}
+            className="mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono"
             placeholder={
               language === "pashto"
                 ? "دلته لیکل پیل کړئ..."
@@ -316,7 +308,7 @@ const AdvanceTypingTest = () => {
 
           {renderKeyboard()}
 
-          <div className="mt-10 w-full max-w-5xl text-lg mt-10">
+          <div className="mt-10 w-full max-w-5xl text-lg">
             <div className="flex justify-between">
               <p>Time: {timer}s</p>
               <p>WPM: {wpm}</p>

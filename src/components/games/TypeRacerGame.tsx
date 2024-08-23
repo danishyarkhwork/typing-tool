@@ -224,10 +224,10 @@ const TypeRacerGame: React.FC = () => {
   );
 
   return (
-    <div className="game-container relative h-screen w-full flex justify-center items-center bg-gray-800 text-white mt-10">
+    <div className="game-container mt-8">
       {/* Main Configuration Page */}
       {!isPlaying && !gameOver && (
-        <div className="bg-gray-900 p-8 rounded-lg shadow-lg text-center space-y-6 z-20 max-w-lg mx-auto">
+        <div className="bg-white p-8 rounded-lg shadow-lg text-center space-y-6 z-20 max-w-lg mx-auto">
           <h1 className="text-4xl font-bold">Type Racer Game</h1>
           <p className="text-lg">
             Improve your typing skills and race against the clock!
@@ -239,7 +239,7 @@ const TypeRacerGame: React.FC = () => {
                 id="language"
                 value={language}
                 onChange={handleLanguageChange}
-                className="p-2 bg-gray-800 border-2 border-gray-600 rounded text-white"
+                className="p-2 bg-gray-200 border-2 border-gray-300 rounded text-gray-900"
               >
                 <option value="en">English</option>
                 <option value="es">Spanish</option>
@@ -255,7 +255,7 @@ const TypeRacerGame: React.FC = () => {
                 id="difficulty"
                 value={difficulty}
                 onChange={handleDifficultyChange}
-                className="p-2 bg-gray-800 border-2 border-gray-600 rounded text-white"
+                className="p-2 bg-gray-200 border-2 border-gray-300 rounded text-gray-900"
               >
                 <option value="easy">Easy</option>
                 <option value="normal">Normal</option>
@@ -274,7 +274,7 @@ const TypeRacerGame: React.FC = () => {
 
       {/* Game Over Screen */}
       {gameOver && (
-        <div className="bg-gray-900 p-8 rounded-lg shadow-lg text-center space-y-6 z-20 max-w-lg mx-auto">
+        <div className="bg-white p-8 rounded-lg shadow-lg text-center space-y-6 z-20 max-w-lg mx-auto">
           <h2 className="text-4xl font-bold text-red-500">Game Over</h2>
           <p className="text-xl">Final Score: {score}</p>
           <button
@@ -288,12 +288,12 @@ const TypeRacerGame: React.FC = () => {
 
       {/* Game Play Area */}
       {isPlaying && !gameOver && (
-        <div className="relative w-full h-full flex flex-col justify-center items-center space-y-8">
+        <div className="relative w-full max-w-4xl mx-auto flex flex-col justify-center items-center space-y-8">
           <h2 className="text-3xl font-bold mb-4 animate-pulse">
             Level {level}
           </h2>
           <div
-            className={`text-2xl font-mono bg-gray-700 p-6 rounded-lg shadow-md transition-transform duration-500 ease-in-out transform hover:scale-105 max-w-4xl mx-auto ${
+            className={`text-2xl font-mono bg-gray-50 p-6 rounded-lg shadow-md max-w-full w-full transition-transform duration-500 ease-in-out transform hover:scale-105 ${
               isRTL() ? "text-right" : "text-left"
             }`}
           >
@@ -303,10 +303,10 @@ const TypeRacerGame: React.FC = () => {
                   key={idx}
                   className={`${
                     input[idx] === char
-                      ? "text-green-400"
+                      ? "text-green-500"
                       : input[idx]
                       ? "text-red-500"
-                      : "text-gray-300"
+                      : "text-gray-500"
                   }`}
                 >
                   {char}
@@ -314,35 +314,35 @@ const TypeRacerGame: React.FC = () => {
               ))}
             </span>
           </div>
-          <div className="flex-grow text-center w-full max-w-xl">
+          <div className="w-full max-w-xl">
             <input
               type="text"
               value={input}
               onChange={handleChange}
-              className="w-full p-4 bg-gray-800 border-2 border-gray-600 rounded-lg text-xl focus:outline-none focus:border-blue-500"
+              className="w-full p-4 bg-gray-200 border-2 border-gray-300 rounded-lg text-xl focus:outline-none focus:border-blue-500"
               placeholder="Type the sentence..."
               autoFocus
               disabled={!isPlaying}
               style={{ width: "100%" }}
               dir={isRTL() ? "rtl" : "ltr"}
             />
-            <div className="relative w-full h-2 mt-4 bg-gray-700 rounded-lg overflow-hidden">
+            <div className="relative w-full h-2 mt-4 bg-gray-300 rounded-lg overflow-hidden">
               <div
                 className="absolute top-0 left-0 h-full bg-blue-500 transition-width duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
-          <div className="fixed bottom-4 left-4 text-xl text-white">
+          <div className="fixed bottom-4 left-4 text-xl text-gray-800">
             Time: {timeTaken.toFixed(2)}s
           </div>
-          <div className="fixed bottom-4 right-4 text-xl text-white">
+          <div className="fixed bottom-4 right-4 text-xl text-gray-800">
             Score: {score}
           </div>
-          <div className="fixed bottom-16 left-4 text-xl text-white">
+          <div className="fixed bottom-16 left-4 text-xl text-gray-800">
             Streak: {streak}
           </div>
-          <div className="fixed bottom-16 right-4 text-xl text-white">
+          <div className="fixed bottom-16 right-4 text-xl text-gray-800">
             Accuracy: {accuracy.toFixed(2)}%
           </div>
         </div>

@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 
-export function useTypingEffect(text, speed = 100, delay = 30000) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [index, setIndex] = useState(0);
-  const [isTyping, setIsTyping] = useState(true);
+export function useTypingEffect(
+  text: string,
+  speed: number = 100,
+  delay: number = 30000
+) {
+  const [displayedText, setDisplayedText] = useState<string>("");
+  const [index, setIndex] = useState<number>(0);
+  const [isTyping, setIsTyping] = useState<boolean>(true);
 
   useEffect(() => {
     const typeCharacter = () => {

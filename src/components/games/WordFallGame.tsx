@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import { nanoid } from "nanoid";
+import useSound from "use-sound";
 
 // Word lists for different languages
 const wordLists = {
@@ -30,7 +31,6 @@ const wordLists = {
   ],
 };
 
-// Word type definition
 type Word = {
   id: string;
   text: string;
@@ -54,14 +54,18 @@ const WordFallGame: React.FC = () => {
   const [language, setLanguage] = useState("english");
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
+
+  const generateRandomWord = useCallback(() => {
+    const wordList = wordLists[language];
+    return wordList[Math.floor(Math.random() * wordList.length)];
+  }, [language]);
+
   useEffect(() => {
-    let gameInterval: NodeJS.Timeout;
-    let fallInterval: NodeJS.Timeout;
-
     if (isPlaying) {
-      setGameOver(false); // Ensure game over is reset when starting
+      setGameOver(false);
 
-      gameInterval = setInterval(
+      const gameInterval = setInterval(
         () => {
           const newWord: Word = {
             id: nanoid(),
@@ -74,7 +78,7 @@ const WordFallGame: React.FC = () => {
         difficulty === "easy" ? 3000 : difficulty === "hard" ? 1200 : 2000
       );
 
-      fallInterval = setInterval(() => {
+      const fallInterval = setInterval(() => {
         setWords((prevWords) =>
           prevWords.map((word) => ({
             ...word,
@@ -105,7 +109,15 @@ const WordFallGame: React.FC = () => {
         clearInterval(timerInterval);
       };
     }
-  }, [isPlaying, fallSpeed, gameDuration, difficulty, score, highScores]);
+  }, [
+    isPlaying,
+    fallSpeed,
+    gameDuration,
+    difficulty,
+    score,
+    highScores,
+    generateRandomWord,
+  ]);
 
   useEffect(() => {
     const containerHeight = containerRef.current?.clientHeight || 0;
@@ -122,15 +134,11 @@ const WordFallGame: React.FC = () => {
     });
   }, [words]);
 
-  const generateRandomWord = useCallback(() => {
-    const wordList = wordLists[language];
-    return wordList[Math.floor(Math.random() * wordList.length)];
-  }, [language]);
-
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       setInput(value);
+      playTypingSound();
 
       const matchIndex = words.findIndex((word) => word.text === value.trim());
       if (matchIndex > -1) {
@@ -140,7 +148,7 @@ const WordFallGame: React.FC = () => {
         setInput("");
       }
     },
-    [words]
+    [words, playTypingSound]
   );
 
   const handleStartPause = useCallback(() => {
@@ -148,43 +156,13 @@ const WordFallGame: React.FC = () => {
       setIsPlaying(false);
     } else {
       setIsPlaying(true);
-      setTimeLeft(gameDuration); // Reset the timer
+      setTimeLeft(gameDuration);
       setScore(0);
       setMissed(0);
       setStreak(0);
-      setWords([]); // Clear words when starting a new game
+      setWords([]);
     }
   }, [isPlaying, gameDuration]);
-
-  const handleSpeedChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFallSpeed(parseInt(e.target.value));
-    },
-    []
-  );
-
-  const handleDurationChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const duration = parseInt(e.target.value);
-      setGameDuration(duration);
-      setTimeLeft(duration);
-    },
-    []
-  );
-
-  const handleDifficultyChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setDifficulty(e.target.value);
-    },
-    []
-  );
-
-  const handleLanguageChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setLanguage(e.target.value);
-    },
-    []
-  );
 
   const handleRestart = () => {
     setGameOver(false);
@@ -194,12 +172,11 @@ const WordFallGame: React.FC = () => {
 
   return (
     <div
-      className="relative h-screen bg-gradient-to-b from-gray-800 to-gray-600 text-white overflow-hidden flex flex-col items-center justify-center"
+      className="relative bg-gradient-to-b from-blue-100 via-slate-200 to-white text-gray-900 min-h-screen flex flex-col items-center pt-20 pb-12"
       ref={containerRef}
     >
-      {/* Main Configuration Page */}
       {!isPlaying && !gameOver && (
-        <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-center space-y-6 z-10">
+        <div className="p-6 rounded-lg shadow-lg text-center space-y-6 z-10">
           <h1 className="text-3xl font-bold">WordFall Typing Game</h1>
           <div className="flex flex-col space-y-4 text-lg">
             <div className="flex justify-between items-center">
@@ -210,7 +187,7 @@ const WordFallGame: React.FC = () => {
                 min="1"
                 max="10"
                 value={fallSpeed}
-                onChange={handleSpeedChange}
+                onChange={(e) => setFallSpeed(parseInt(e.target.value))}
                 className="slider"
               />
             </div>
@@ -219,7 +196,11 @@ const WordFallGame: React.FC = () => {
               <select
                 id="duration"
                 value={gameDuration}
-                onChange={handleDurationChange}
+                onChange={(e) => {
+                  const duration = parseInt(e.target.value);
+                  setGameDuration(duration);
+                  setTimeLeft(duration);
+                }}
                 className="p-2 bg-gray-800 border-2 border-gray-600 rounded text-white"
               >
                 <option value={30}>30 seconds</option>
@@ -233,7 +214,7 @@ const WordFallGame: React.FC = () => {
               <select
                 id="difficulty"
                 value={difficulty}
-                onChange={handleDifficultyChange}
+                onChange={(e) => setDifficulty(e.target.value)}
                 className="p-2 bg-gray-800 border-2 border-gray-600 rounded text-white"
               >
                 <option value="easy">Easy</option>
@@ -246,7 +227,7 @@ const WordFallGame: React.FC = () => {
               <select
                 id="language"
                 value={language}
-                onChange={handleLanguageChange}
+                onChange={(e) => setLanguage(e.target.value)}
                 className="p-2 bg-gray-800 border-2 border-gray-600 rounded text-white"
               >
                 <option value="english">English</option>
@@ -263,9 +244,8 @@ const WordFallGame: React.FC = () => {
         </div>
       )}
 
-      {/* Game Over Screen */}
       {gameOver && (
-        <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-center space-y-6 z-10">
+        <div className="p-6 rounded-lg shadow-lg text-center space-y-6 z-10">
           <h2 className="text-3xl font-bold text-red-500">Game Over</h2>
           <p className="text-xl">Score: {score}</p>
           <p className="text-xl">Missed: {missed}</p>
@@ -280,39 +260,49 @@ const WordFallGame: React.FC = () => {
         </div>
       )}
 
-      {/* Game Play Area */}
       {isPlaying && !gameOver && (
         <>
           {words.map((word) => (
             <div
               key={word.id}
               style={{ top: `${word.top}px`, left: `${word.left}%` }}
-              className="absolute text-2xl font-bold animate-bounce z-0"
+              className="absolute text-2xl font-bold z-10"
             >
               {word.text}
             </div>
           ))}
 
-          <div className="fixed bottom-0 left-0 right-0 bg-gray-900 bg-opacity-95 backdrop-blur-md p-4 flex justify-between items-center text-white z-10">
-            {/* Left Section: Score, Missed, Streak, Time Left */}
-            <div className="flex space-x-4 text-xl">
-              <p>Score: {score}</p>
-              <p>Missed: {missed}</p>
-              <p>Streak: {streak}</p>
-              <p>Time Left: {timeLeft}s</p>
-            </div>
-
-            {/* Center Section: Input Field */}
-            <div className="flex-grow text-center">
-              <input
-                type="text"
-                value={input}
-                onChange={handleChange}
-                className="w-full max-w-lg p-3 bg-gray-800 border-2 border-gray-600 rounded text-xl focus:outline-none focus:border-blue-500 mx-auto"
-                placeholder="Type the word..."
-                autoFocus
-                disabled={!isPlaying}
-              />
+          <div className="fixed bottom-0 max-w-6xl w-full bg-gray-900 p-6 rounded-t-xl shadow-2xl text-white z-10 flex flex-col items-center space-y-4 border-t border-gray-700">
+            <div className="flex w-full text-md text-center space-x-4 items-center">
+              <div className="bg-gray-800 px-4 py-2 rounded-lg shadow-lg flex items-center justify-center">
+                <span className="text-blue-400 font-semibold">Score: </span>
+                <span className="ml-1">{score}</span>
+              </div>
+              <div className="bg-gray-800 px-4 py-2 rounded-lg shadow-lg flex items-center justify-center">
+                <span className="text-red-400 font-semibold">Missed: </span>
+                <span className="ml-1">{missed}</span>
+              </div>
+              <div className="flex-grow mx-4">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={handleChange}
+                  className="w-full text-lg p-3 bg-gray-800 text-white border-2 border-gray-700 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 shadow-md"
+                  placeholder="Type the word..."
+                  autoFocus
+                  disabled={!isPlaying}
+                />
+              </div>
+              <div className="bg-gray-800 px-4 py-2 rounded-lg shadow-lg flex items-center justify-center">
+                <span className="text-green-400 font-semibold">Streak: </span>
+                <span className="ml-1">{streak}</span>
+              </div>
+              <div className="bg-gray-800 px-4 py-2 rounded-lg shadow-lg flex items-center justify-center">
+                <span className="text-yellow-400 font-semibold">
+                  Time Left:{" "}
+                </span>
+                <span className="ml-1">{timeLeft}s</span>
+              </div>
             </div>
           </div>
         </>
