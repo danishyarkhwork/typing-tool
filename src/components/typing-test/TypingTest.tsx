@@ -9,6 +9,7 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from "react-share";
+import useSound from "use-sound";
 
 // Define type for languageWords
 type WordLists = {
@@ -227,6 +228,8 @@ const TypingTest: React.FC = () => {
   const textRef = useRef<HTMLDivElement>(null);
   const wordsPerPage = 20;
 
+  const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
+
   useEffect(() => {
     setText(generateRandomWords(100, getWordList(difficulty, language)));
   }, [difficulty, language]);
@@ -250,6 +253,8 @@ const TypingTest: React.FC = () => {
     if (!isTyping) setIsTyping(true);
     const value = e.target.value;
 
+    playTypingSound(); // Play sound on each keypress
+
     if (value.endsWith(" ")) {
       const trimmedValue = value.trim();
       if (trimmedValue !== text[currentIndex]) {
@@ -270,7 +275,12 @@ const TypingTest: React.FC = () => {
     if (textRef.current) {
       const words = textRef.current.querySelectorAll("span");
       words.forEach((word, index) => {
-        word.classList.remove("bg-gray-200", "text-green-500", "text-red-500");
+        word.classList.remove(
+          "bg-gray-200",
+          "dark:bg-gray-600",
+          "text-green-500",
+          "text-red-500"
+        );
         if (index === currentIndex) {
           if (
             currentInput.trim() !==
@@ -278,7 +288,12 @@ const TypingTest: React.FC = () => {
           ) {
             word.classList.add("text-red-500");
           } else {
-            word.classList.add("bg-gray-200", "px-1", "rounded");
+            word.classList.add(
+              "bg-gray-200",
+              "dark:bg-gray-600",
+              "px-1",
+              "rounded"
+            );
           }
         } else if (index < currentIndex) {
           if (typedWords[index] !== text[index]) {
@@ -300,11 +315,27 @@ const TypingTest: React.FC = () => {
     const accuracy = ((correctWordsCount / typedWords.length) * 100).toFixed(2);
     setWpm(wpm);
     setAccuracy(parseFloat(accuracy));
+
+    // Avoid duplicates in history and leaderboard
     const result = { wpm, accuracy: parseFloat(accuracy) };
-    setHistory([...history, result]);
-    setLeaderboard(
-      [...leaderboard, result].sort((a, b) => b.wpm - a.wpm).slice(0, 10)
-    );
+    if (
+      !history.some(
+        (entry) =>
+          entry.wpm === result.wpm && entry.accuracy === result.accuracy
+      )
+    ) {
+      setHistory([...history, result]);
+    }
+    if (
+      !leaderboard.some(
+        (entry) =>
+          entry.wpm === result.wpm && entry.accuracy === result.accuracy
+      )
+    ) {
+      setLeaderboard(
+        [...leaderboard, result].sort((a, b) => b.wpm - a.wpm).slice(0, 10)
+      );
+    }
   };
 
   const handleRestart = () => {
@@ -347,48 +378,50 @@ const TypingTest: React.FC = () => {
   const shareUrl = window.location.href;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto my-8 bg-white rounded-xl shadow-lg space-y-6">
+    <div className="p-6 max-w-6xl mx-auto my-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg space-y-8">
       <div className="flex justify-between items-center mb-6">
-        <select
-          value={selectedTime}
-          onChange={handleTimeChange}
-          className="p-2 border border-gray-300 rounded"
-        >
-          <option value={30}>30 seconds</option>
-          <option value={60}>60 seconds</option>
-          <option value={120}>120 seconds</option>
-        </select>
+        <div className="flex space-x-4">
+          <select
+            value={selectedTime}
+            onChange={handleTimeChange}
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+          >
+            <option value={30}>30 seconds</option>
+            <option value={60}>60 seconds</option>
+            <option value={120}>120 seconds</option>
+          </select>
 
-        <select
-          value={difficulty}
-          onChange={handleDifficultyChange}
-          className="p-2 border border-gray-300 rounded"
-        >
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="complex">Complex</option>
-        </select>
+          <select
+            value={difficulty}
+            onChange={handleDifficultyChange}
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+          >
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="complex">Complex</option>
+          </select>
 
-        <select
-          value={language}
-          onChange={handleLanguageChange}
-          className="p-2 border border-gray-300 rounded"
-        >
-          <option value="english">English</option>
-          <option value="pashto">Pashto</option>
-          {/* Add more languages as needed */}
-        </select>
+          <select
+            value={language}
+            onChange={handleLanguageChange}
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+          >
+            <option value="english">English</option>
+            <option value="pashto">Pashto</option>
+            {/* Add more languages as needed */}
+          </select>
+        </div>
 
         <button
           onClick={handleRestart}
-          className="p-2 bg-blue-500 text-white rounded shadow"
+          className="p-2 bg-blue-500 text-white rounded shadow-lg hover:bg-blue-600 transition duration-300"
         >
           Restart
         </button>
       </div>
 
       {timeLeft === 0 ? (
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-6">
           <div className="text-5xl font-bold text-green-500">{wpm} WPM</div>
           <div className="text-2xl">
             Keystrokes:{" "}
@@ -433,7 +466,7 @@ const TypingTest: React.FC = () => {
         <>
           <div
             id="words"
-            className={`text-4xl font-semibold whitespace-pre-wrap leading-relaxed tracking-wide ${
+            className={`text-4xl font-mono whitespace-pre-wrap leading-relaxed tracking-wide ${
               language === "pashto" ? "text-right" : "text-left"
             }`}
             dir={language === "pashto" ? "rtl" : "ltr"}
@@ -453,7 +486,7 @@ const TypingTest: React.FC = () => {
                   key={index}
                   className={`${
                     absoluteIndex === currentIndex
-                      ? "bg-gray-200 px-1 rounded"
+                      ? "bg-gray-200 dark:bg-gray-600 px-1 rounded"
                       : wordClass
                   }`}
                 >
@@ -466,7 +499,7 @@ const TypingTest: React.FC = () => {
             type="text"
             value={input}
             onChange={handleChange}
-            className={`w-full p-3 mt-4 border border-gray-300 rounded text-4xl ${
+            className={`w-full p-3 mt-4 border border-gray-300 dark:border-gray-600 rounded text-4xl font-mono bg-gray-100 dark:bg-gray-700 ${
               language === "pashto" ? "text-right" : "text-left"
             }`}
             placeholder={
@@ -479,7 +512,7 @@ const TypingTest: React.FC = () => {
             autoFocus
           />
 
-          <div className="flex justify-between items-center text-gray-900 mt-4">
+          <div className="flex justify-between items-center text-gray-900 dark:text-gray-200 mt-4">
             <div className="text-2xl">Time Left: {timeLeft}s</div>
             {wpm !== null && <div className="text-2xl">WPM: {wpm}</div>}
             {accuracy !== null && (

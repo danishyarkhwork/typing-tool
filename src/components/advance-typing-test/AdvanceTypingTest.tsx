@@ -158,9 +158,9 @@ const AdvanceTypingTest = () => {
           className={`mx-1 p-1 rounded leading-relaxed mb-2 ${
             // Added leading-relaxed and mb-2 classes
             isCorrect
-              ? "bg-green-300 text-white"
+              ? "bg-green-500 text-white" // Slightly brighter green for modern look
               : isCurrentWord
-              ? "bg-blue-300 text-white" // Changed to lighter blue
+              ? "bg-blue-500 text-white" // Changed to consistent blue
               : "text-gray-600"
           }`}
         >
@@ -205,7 +205,7 @@ const AdvanceTypingTest = () => {
               isActive
                 ? "bg-blue-700 text-white"
                 : isNextKey
-                ? "bg-yellow-400 text-white animate-pulse"
+                ? "bg-yellow-500 text-white animate-pulse" // Updated to a brighter yellow
                 : "bg-gray-300 text-black"
             }`}
           >
@@ -295,7 +295,7 @@ const AdvanceTypingTest = () => {
               darkMode
                 ? "bg-gray-800 border-gray-600 text-white"
                 : "border-gray-300 text-black"
-            } rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono`} // Updated input font style and size
+            } rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono`}
             placeholder={
               language === "pashto"
                 ? "دلته لیکل پیل کړئ..."
