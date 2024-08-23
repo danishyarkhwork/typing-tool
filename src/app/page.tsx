@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -119,13 +120,13 @@ export default function Home() {
                           progression.
                         </p>
                         <div className="absolute -bottom-3 right-3">
-                          <a
-                            className="text-sm px-3 py-2 bg-yellow-300 rounded-lg shadow-xl btn btn-a"
-                            href="/student/lessons"
+                          <Link
+                            className="text-sm px-3 py-2 bg-yellow-300 text-gray-600 rounded-lg shadow-xl btn btn-a"
+                            href="/advance-typing-test"
                             role="button"
                           >
                             Start Typing Today »
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -157,13 +158,13 @@ export default function Home() {
                           reporting, and more.
                         </p>
                         <div className="absolute -bottom-3 right-3">
-                          <a
+                          <Link
                             className="text-sm px-3 py-2 bg-yellow-300 rounded-lg shadow-xl btn btn-a"
-                            href="/student/lessons"
+                            href="#"
                             role="button"
                           >
                             Sign Up Now »
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     </div>

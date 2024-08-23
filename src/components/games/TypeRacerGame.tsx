@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import { nanoid } from "nanoid";
+import useSound from "use-sound";
 
 // Sentence lists for different difficulty levels and languages
 const sentenceLists: Record<
@@ -121,6 +122,8 @@ const TypeRacerGame: React.FC = () => {
   const [errors, setErrors] = useState(0);
   const startTimeRef = useRef<number | null>(null);
 
+  const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
+
   // Check if the current language is a RTL language
   const isRTL = useCallback(() => {
     return ["ps", "fa", "ar"].includes(language);
@@ -156,6 +159,8 @@ const TypeRacerGame: React.FC = () => {
       const value = e.target.value;
       setInput(value);
 
+      playTypingSound(); // Play sound on each keypress
+
       if (currentSentence) {
         const currentText = currentSentence.sentence.substring(0, value.length);
         const isCorrect = value === currentText;
@@ -185,7 +190,7 @@ const TypeRacerGame: React.FC = () => {
         }
       }
     },
-    [currentSentence, errors]
+    [currentSentence, errors, playTypingSound]
   );
 
   const handleStart = useCallback(() => {
