@@ -43,6 +43,14 @@ const Footer = () => {
                   Advance Typing Test
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/multiplayer-typing-test"
+                  className="hover:text-gray-100 transition-colors duration-200"
+                >
+                  Multiplayer Typing
+                </Link>
+              </li>
             </ul>
           </div>
 

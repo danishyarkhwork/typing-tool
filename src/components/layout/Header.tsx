@@ -119,8 +119,8 @@ const Header = () => {
                 )}
               </li>
               <li className="nav-item">
-                <Link className="nav-link" href="/text-practice">
-                  Text Practice
+                <Link className="nav-link" href="/multiplayer-typing-test">
+                  Multiplayer Typing Test
                 </Link>
               </li>
             </ul>
@@ -240,10 +240,10 @@ const Header = () => {
             </li>
             <li className="nav-item">
               <Link
-                href="/text-practice"
                 className="nav-link text-lg font-medium"
+                href="/multiplayer-typing-test"
               >
-                Text Practice
+                Multiplayer Typing Test
               </Link>
             </li>
             <div className="flex space-x-4">
