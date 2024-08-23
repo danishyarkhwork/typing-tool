@@ -86,6 +86,11 @@ const Header = () => {
                         Advanced Test
                       </Link>
                     </div>
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/custom-typing-test">
+                        Custom Typing Test
+                      </Link>
+                    </div>
                   </div>
                 )}
               </li>
