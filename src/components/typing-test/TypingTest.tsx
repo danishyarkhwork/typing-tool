@@ -168,7 +168,6 @@ const languageWords: Languages = {
       "منډه",
       "ټوپ",
       "لوبه",
-      //... other easy Pashto words
     ],
     medium: [
       "ښکلی",
@@ -179,7 +178,6 @@ const languageWords: Languages = {
       "پخلنځی",
       "پيل",
       "خبره",
-      //... other medium Pashto words
     ],
     complex: [
       "فلسفه",
@@ -192,7 +190,6 @@ const languageWords: Languages = {
       "پراسرار",
       "فوق العاده",
       "زیږنتون",
-      //... other complex Pashto words
     ],
   },
 };
@@ -224,6 +221,7 @@ const TypingTest: React.FC = () => {
   >([]);
   const [difficulty, setDifficulty] = useState("easy");
   const [language, setLanguage] = useState("english");
+  const [gameOver, setGameOver] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const wordsPerPage = 20;
@@ -236,12 +234,11 @@ const TypingTest: React.FC = () => {
 
   useEffect(() => {
     if (isTyping && timeLeft > 0) {
-      timerRef.current = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
+      timerRef.current = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     } else if (timeLeft === 0) {
       calculateResults();
       setIsTyping(false);
+      setGameOver(true);
       if (timerRef.current) clearTimeout(timerRef.current);
     }
     return () => {
@@ -253,7 +250,7 @@ const TypingTest: React.FC = () => {
     if (!isTyping) setIsTyping(true);
     const value = e.target.value;
 
-    playTypingSound(); // Play sound on each keypress
+    playTypingSound();
 
     if (value.endsWith(" ")) {
       const trimmedValue = value.trim();
@@ -316,26 +313,23 @@ const TypingTest: React.FC = () => {
     setWpm(wpm);
     setAccuracy(parseFloat(accuracy));
 
-    // Avoid duplicates in history and leaderboard
     const result = { wpm, accuracy: parseFloat(accuracy) };
-    if (
-      !history.some(
+    setHistory((prev) =>
+      prev.some(
         (entry) =>
           entry.wpm === result.wpm && entry.accuracy === result.accuracy
       )
-    ) {
-      setHistory([...history, result]);
-    }
-    if (
-      !leaderboard.some(
+        ? prev
+        : [...prev, result]
+    );
+    setLeaderboard((prev) =>
+      prev.some(
         (entry) =>
           entry.wpm === result.wpm && entry.accuracy === result.accuracy
       )
-    ) {
-      setLeaderboard(
-        [...leaderboard, result].sort((a, b) => b.wpm - a.wpm).slice(0, 10)
-      );
-    }
+        ? prev
+        : [...prev, result].sort((a, b) => b.wpm - a.wpm).slice(0, 10)
+    );
   };
 
   const handleRestart = () => {
@@ -349,6 +343,13 @@ const TypingTest: React.FC = () => {
     setErrors(0);
     setCorrectWords(0);
     setCurrentIndex(0);
+    setGameOver(false);
+  };
+
+  const handleStartTest = () => {
+    setIsTyping(true);
+    setTimeLeft(selectedTime);
+    setGameOver(false);
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -379,56 +380,59 @@ const TypingTest: React.FC = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto my-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg space-y-8">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex space-x-4">
-          <select
-            value={selectedTime}
-            onChange={handleTimeChange}
-            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-          >
-            <option value={30}>30 seconds</option>
-            <option value={60}>60 seconds</option>
-            <option value={120}>120 seconds</option>
-          </select>
+      {!isTyping && !gameOver && (
+        <div className="flex flex-col items-center space-y-6">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Typing Test Settings
+          </h1>
+          <div className="flex flex-wrap justify-center space-x-4 space-y-4 md:space-y-0">
+            <select
+              value={selectedTime}
+              onChange={handleTimeChange}
+              className="p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+            >
+              <option value={30}>30 seconds</option>
+              <option value={60}>60 seconds</option>
+              <option value={120}>120 seconds</option>
+            </select>
 
-          <select
-            value={difficulty}
-            onChange={handleDifficultyChange}
-            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-          >
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="complex">Complex</option>
-          </select>
+            <select
+              value={difficulty}
+              onChange={handleDifficultyChange}
+              className="p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+            >
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="complex">Complex</option>
+            </select>
 
-          <select
-            value={language}
-            onChange={handleLanguageChange}
-            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+            <select
+              value={language}
+              onChange={handleLanguageChange}
+              className="p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+            >
+              <option value="english">English</option>
+              <option value="pashto">Pashto</option>
+            </select>
+          </div>
+          <button
+            onClick={handleStartTest}
+            className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
           >
-            <option value="english">English</option>
-            <option value="pashto">Pashto</option>
-            {/* Add more languages as needed */}
-          </select>
+            Start Test
+          </button>
         </div>
+      )}
 
-        <button
-          onClick={handleRestart}
-          className="p-2 bg-blue-500 text-white rounded shadow-lg hover:bg-blue-600 transition duration-300"
-        >
-          Restart
-        </button>
-      </div>
-
-      {timeLeft === 0 ? (
+      {gameOver && (
         <div className="text-center space-y-6">
-          <div className="text-5xl font-bold text-green-500">{wpm} WPM</div>
+          <h2 className="text-5xl font-bold text-green-500">{wpm} WPM</h2>
           <div className="text-2xl">
             Keystrokes:{" "}
             <span className="text-green-500">
               {typedWords.join("").length + typedWords.length - 1}
             </span>{" "}
-            | <span className="text-red-500">{errors}</span>
+            | Errors: <span className="text-red-500">{errors}</span>
           </div>
           <div className="text-2xl">Accuracy: {accuracy}%</div>
           <div className="text-2xl">
@@ -440,11 +444,8 @@ const TypingTest: React.FC = () => {
           </div>
           <div className="mt-4 flex justify-center space-x-4">
             <FacebookShareButton
-              url={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                shareUrl
-              )}&quote=${encodeURIComponent(
-                `I scored ${wpm} WPM with ${accuracy}% accuracy!`
-              )}`}
+              url={shareUrl}
+              quote={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
             >
               <FacebookIcon size={40} round />
             </FacebookShareButton>
@@ -461,8 +462,16 @@ const TypingTest: React.FC = () => {
               <WhatsappIcon size={40} round />
             </WhatsappShareButton>
           </div>
+          <button
+            onClick={handleRestart}
+            className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 mt-4"
+          >
+            Restart Test
+          </button>
         </div>
-      ) : (
+      )}
+
+      {isTyping && !gameOver && (
         <>
           <div
             id="words"
@@ -511,7 +520,6 @@ const TypingTest: React.FC = () => {
             dir={language === "pashto" ? "rtl" : "ltr"}
             autoFocus
           />
-
           <div className="flex justify-between items-center text-gray-900 dark:text-gray-200 mt-4">
             <div className="text-2xl">Time Left: {timeLeft}s</div>
             {wpm !== null && <div className="text-2xl">WPM: {wpm}</div>}
@@ -521,6 +529,7 @@ const TypingTest: React.FC = () => {
           </div>
         </>
       )}
+
       {history.length > 0 && (
         <div className="mt-6">
           <h2 className="text-2xl font-semibold">Typing History</h2>
