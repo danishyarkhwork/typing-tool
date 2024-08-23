@@ -3,7 +3,7 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-16">
+    <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
       <div className="container sm:px-8 md:px-6xl lg:px-6xl">
         <div className="grid gap-10 lg:grid-cols-5 text-left">
           {/* Logo and Description */}
@@ -105,8 +105,15 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col lg:flex-row justify-between items-center text-gray-500 text-sm">
-            <p className="sm:mb-4 lg:mb-0">
-              © 2024 Typing Tests. All rights reserved. Powered by{" "}
+            <p className="sm:mb-4 lg:mb-0 text-center md:text-left lg:text-left">
+              © 2024{" "}
+              <a
+                href="#"
+                className="text-white hover:text-primary transition-colors duration-200"
+              >
+                Typing Tests
+              </a>
+              . All rights reserved. Powered by{" "}
               <a
                 href="https://khaliddanishyar.com"
                 className="text-white hover:text-primary transition-colors duration-200"

@@ -1,408 +1,268 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [activeMobileDropdown, setActiveMobileDropdown] = useState(null);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleMouseEnter = (menu) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setActiveDropdown(menu);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 200);
+  };
+
+  const toggleMobileDropdown = (menu) => {
+    setActiveMobileDropdown(activeMobileDropdown === menu ? null : menu);
+  };
 
   return (
     <>
       <header
         id="navbar"
-        className="light fixed top-0 inset-x-0 flex items-center z-40 w-full bg-white transition-all py-5"
+        className={`fixed top-0 inset-x-0 flex items-center z-40 w-full transition-all py-5 ${
+          isScrolled
+            ? "bg-white bg-opacity-70 backdrop-blur-md shadow-lg"
+            : "bg-transparent"
+        }`}
       >
-        <div className="container">
-          <nav className="flex items-center">
-            <Link href="/">
-              <img
-                src="assets/images/logo-dark.png"
-                className="h-8 logo-dark"
-                alt="Logo Dark"
-              />
-              <img
-                src="assets/images/logo-light.png"
-                className="h-8 logo-light"
-                alt="Logo Light"
-              />
-            </Link>
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <img
+              src="assets/images/logo-dark.png"
+              className="h-8 logo-dark"
+              alt="Logo Dark"
+            />
+            <img
+              src="assets/images/logo-light.png"
+              className="h-8 logo-light"
+              alt="Logo Light"
+            />
+          </Link>
 
-            <div className="hidden lg:block ms-auto">
-              <ul className="navbar-nav flex gap-x-3 items-center justify-center">
-                <li className="nav-item">
-                  <Link className="nav-link" href="/">
-                    Home
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <a
-                    href="javascript:void(0);"
-                    className="nav-link after:absolute hover:after:-bottom-10 after:inset-0 fc-dropdown"
-                    data-fc-trigger="hover"
-                    data-fc-target="innerPageDropdownMenu"
-                    data-fc-type="dropdown"
-                    data-fc-placement="bottom"
-                  >
-                    Typing{" "}
-                    <i className="fa-solid fa-angle-down ms-2 align-middle"></i>
-                  </a>
-
-                  <div
-                    id="innerPageDropdownMenu"
-                    style={{ left: "901.922px", top: "58px" }}
-                    className="opacity-0 mt-4 fc-dropdown-open:opacity-100 fc-dropdown-open:translate-y-0 translate-y-3 origin-center transition-all bg-white rounded-lg shadow-lg border p-2 w-48 space-y-1.5 fc-dropdown absolute hidden"
-                  >
+          <div className="hidden lg:block">
+            <ul className="navbar-nav flex gap-x-6 items-center justify-center">
+              <li className="nav-item">
+                <Link className="nav-link" href="/">
+                  Home
+                </Link>
+              </li>
+              <li
+                className="nav-item relative"
+                onMouseEnter={() => handleMouseEnter("typing")}
+                onMouseLeave={handleMouseLeave}
+              >
+                <a className="nav-link cursor-pointer">
+                  Typing{" "}
+                  <i className="fa-solid fa-angle-down ms-2 align-middle"></i>
+                </a>
+                {activeDropdown === "typing" && (
+                  <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-lg border p-2 w-48">
                     <div className="nav-item">
                       <Link className="nav-link" href="/typing-test">
                         Typing Test
                       </Link>
                     </div>
-
                     <div className="nav-item">
                       <Link className="nav-link" href="/advance-typing-test">
                         Advanced Test
                       </Link>
                     </div>
                   </div>
-                </li>
-
-                <li className="nav-item">
-                  <a
-                    href="javascript:void(0);"
-                    className="nav-link after:absolute hover:after:-bottom-10 after:inset-0 fc-dropdown"
-                    data-fc-trigger="hover"
-                    data-fc-target="innerPageDropdownMenu2"
-                    data-fc-type="dropdown"
-                    data-fc-placement="bottom"
-                  >
-                    Games{" "}
-                    <i className="fa-solid fa-angle-down ms-2 align-middle"></i>
-                  </a>
-
-                  <div
-                    id="innerPageDropdownMenu2"
-                    style={{ left: "901.922px", top: "58px" }}
-                    className="opacity-0 mt-4 fc-dropdown-open:opacity-100 fc-dropdown-open:translate-y-0 translate-y-3 origin-center transition-all bg-white rounded-lg shadow-lg border p-2 w-48 space-y-1.5 fc-dropdown absolute hidden"
-                  >
+                )}
+              </li>
+              <li
+                className="nav-item relative"
+                onMouseEnter={() => handleMouseEnter("games")}
+                onMouseLeave={handleMouseLeave}
+              >
+                <a className="nav-link cursor-pointer">
+                  Games{" "}
+                  <i className="fa-solid fa-angle-down ms-2 align-middle"></i>
+                </a>
+                {activeDropdown === "games" && (
+                  <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-lg border p-2 w-48">
                     <div className="nav-item">
                       <Link className="nav-link" href="/words-fall-game">
                         Words Fall Game
                       </Link>
                     </div>
-
                     <div className="nav-item">
                       <Link className="nav-link" href="/type-and-destroy-game">
                         Type & Destroy
                       </Link>
                     </div>
-
                     <div className="nav-item">
                       <Link className="nav-link" href="/typing-speed-ai">
                         Typing Speed AI
                       </Link>
                     </div>
                   </div>
-                </li>
+                )}
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" href="/text-practice">
+                  Text Practice
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-                <li className="nav-item">
-                  <Link className="nav-link" href="contact.html">
-                    Typing Competition
-                  </Link>
-                </li>
+          <div className="hidden lg:flex items-center space-x-4">
+            <Link
+              href="/login"
+              className="bg-primary text-white px-4 py-2 rounded-lg inline-flex items-center text-sm font-medium shadow-md hover:bg-primary-dark transition-colors"
+            >
+              Login
+            </Link>
+            <Link
+              href="/signup"
+              className="text-primary px-4 py-2 rounded-lg border border-primary inline-flex items-center text-sm font-medium shadow-md hover:bg-primary hover:text-white transition-colors"
+            >
+              Sign Up
+            </Link>
+          </div>
 
-                <li className="nav-item">
-                  <Link className="nav-link" href="contact.html">
-                    Text Practice
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="hidden lg:flex items-center ms-3">
-              <Link
-                href="https://1.envato.market/prompt-tailwind"
-                target="_blank"
-                className="bg-primary text-white px-4 py-2 rounded inline-flex items-center text-sm"
-              >
-                Login
-              </Link>
-            </div>
-
-            <div className="lg:hidden flex items-center ms-auto px-2.5">
-              <button
-                type="button"
-                data-fc-target="mobileMenu"
-                data-fc-type="offcanvas"
-              >
-                <i className="fa-solid fa-bars text-2xl text-gray-500"></i>
-              </button>
-            </div>
-          </nav>
+          <div className="lg:hidden flex items-center">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-2xl text-gray-500"
+            >
+              <i className="fa-solid fa-bars"></i>
+            </button>
+          </div>
         </div>
       </header>
 
-      <div
-        id="mobileMenu"
-        className="fc-offcanvas-open:translate-x-0 translate-x-full fixed top-0 end-0 transition-all duration-200 transform h-full w-full max-w-md z-50 bg-white border-s hidden"
-      >
-        <div className="flex flex-col h-full divide-y-2 divide-gray-200">
-          <div className="p-6 flex items-center justify-between">
-            <Link href="index.html">
+      {mobileMenuOpen && (
+        <div
+          id="mobileMenu"
+          className="fixed top-0 inset-x-0 z-50 h-screen bg-white p-6 flex flex-col space-y-4 overflow-y-auto"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <Link href="/" className="flex items-center">
               <img
                 src="assets/images/logo-dark.png"
                 className="h-8"
                 alt="Logo"
               />
             </Link>
-
-            <button data-fc-dismiss className="flex items-center px-2">
-              <i className="fa-solid fa-xmark text-xl"></i>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-2xl text-gray-500"
+            >
+              <i className="fa-solid fa-xmark"></i>
             </button>
           </div>
-
-          <div className="p-6 overflow-scroll h-full">
-            <ul
-              className="navbar-nav flex flex-col gap-2"
-              data-fc-type="accordion"
-            >
-              <li className="nav-item">
-                <Link href="/" className="nav-link">
-                  Home
-                </Link>
-              </li>
-
-              <li className="nav-item">
-                <Link
-                  href="javascript:void(0)"
-                  data-fc-type="collapse"
-                  className="nav-link"
-                >
-                  Landing
-                  <i className="fa-solid fa-angle-down ms-auto align-middle transition-all fc-collapse-open:rotate-180"></i>
-                </Link>
-
-                <ul className="hidden overflow-hidden transition-[height] duration-300 space-y-2">
-                  <li className="nav-item mt-2">
-                    <Link className="nav-link" href="home-app.html">
-                      App
+          <ul className="flex flex-col space-y-4">
+            <li className="nav-item">
+              <Link href="/" className="nav-link text-lg font-medium">
+                Home
+              </Link>
+            </li>
+            <li className="nav-item">
+              <button
+                className="nav-link text-lg font-medium flex justify-between items-center w-full"
+                onClick={() => toggleMobileDropdown("typing")}
+              >
+                Typing
+                <i
+                  className={`fa-solid fa-angle-down ${
+                    activeMobileDropdown === "typing" ? "rotate-180" : ""
+                  } transition-transform`}
+                ></i>
+              </button>
+              {activeMobileDropdown === "typing" && (
+                <ul className="pl-4 mt-2 space-y-2">
+                  <li>
+                    <Link className="nav-link" href="/typing-test">
+                      Typing Test
                     </Link>
                   </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-saas.html">
-                      Saas Modern
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-saas2.html">
-                      Saas Classic
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-startup.html">
-                      Startup
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-software.html">
-                      Software
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-agency.html">
-                      Agency
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-coworking.html">
-                      Coworking
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-crypto.html">
-                      Crypto
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-marketing.html">
-                      Marketing
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="home-portfolio.html">
-                      Portfolio
+                  <li>
+                    <Link className="nav-link" href="/advance-typing-test">
+                      Advanced Test
                     </Link>
                   </li>
                 </ul>
-              </li>
-
-              <li className="nav-item">
-                <Link
-                  href="javascript:void(0)"
-                  data-fc-type="collapse"
-                  className="nav-link"
-                >
-                  Pages
-                  <i className="fa-solid fa-angle-down ms-auto align-middle transition-all fc-collapse-open:rotate-180"></i>
-                </Link>
-
-                <ul className="hidden overflow-hidden transition-[height] duration-300 space-y-2">
-                  <li className="nav-item mt-2">
-                    <Link className="nav-link" href="company.html">
-                      Company
+              )}
+            </li>
+            <li className="nav-item">
+              <button
+                className="nav-link text-lg font-medium flex justify-between items-center w-full"
+                onClick={() => toggleMobileDropdown("games")}
+              >
+                Games
+                <i
+                  className={`fa-solid fa-angle-down ${
+                    activeMobileDropdown === "games" ? "rotate-180" : ""
+                  } transition-transform`}
+                ></i>
+              </button>
+              {activeMobileDropdown === "games" && (
+                <ul className="pl-4 mt-2 space-y-2">
+                  <li>
+                    <Link className="nav-link" href="/words-fall-game">
+                      Words Fall Game
                     </Link>
                   </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="career.html">
-                      Career
+                  <li>
+                    <Link className="nav-link" href="/type-and-destroy-game">
+                      Type & Destroy
                     </Link>
                   </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="pricing.html">
-                      Pricing
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="help.html">
-                      Help
+                  <li>
+                    <Link className="nav-link" href="/typing-speed-ai">
+                      Typing Speed AI
                     </Link>
                   </li>
                 </ul>
-              </li>
-
-              <li className="nav-item">
-                <Link
-                  href="javascript:void(0)"
-                  data-fc-type="collapse"
-                  className="nav-link"
-                >
-                  Blog Page
-                  <i className="fa-solid fa-angle-down ms-auto align-middle transition-all fc-collapse-open:rotate-180"></i>
-                </Link>
-
-                <ul className="hidden overflow-hidden transition-[height] duration-300 space-y-2">
-                  <li className="nav-item mt-2">
-                    <Link className="nav-link" href="blog.html">
-                      Blog
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="blog-post.html">
-                      Blog Post
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              <li className="nav-item">
-                <Link
-                  href="javascript:void(0)"
-                  data-fc-type="collapse"
-                  className="nav-link"
-                >
-                  Portfolio
-                  <i className="fa-solid fa-angle-down ms-auto align-middle transition-all fc-collapse-open:rotate-180"></i>
-                </Link>
-
-                <ul className="hidden overflow-hidden transition-[height] duration-300 space-y-2">
-                  <li className="nav-item mt-2">
-                    <Link className="nav-link" href="portfolio-grid.html">
-                      Portfolio Grid
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="portfolio-masonry.html">
-                      Portfolio Masonry
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="portfolio-item.html">
-                      Portfolio Item
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="account-confirm.html">
-                      Confirm Account
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              <li className="nav-item">
-                <Link
-                  href="javascript:void(0)"
-                  data-fc-type="collapse"
-                  className="nav-link"
-                >
-                  Account
-                  <i className="fa-solid fa-angle-down ms-auto align-middle transition-all fc-collapse-open:rotate-180"></i>
-                </Link>
-
-                <ul className="hidden overflow-hidden transition-[height] duration-300 space-y-2">
-                  <li className="nav-item mt-2">
-                    <Link className="nav-link" href="account-login.html">
-                      Login
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="account-signup.html">
-                      Sign Up
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      href="account-forget-password.html"
-                    >
-                      Forget Password
-                    </Link>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link className="nav-link" href="account-confirm.html">
-                      Confirm Account
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              <li className="nav-item">
-                <Link className="nav-link" href="contact.html">
-                  Contact us
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="p-6 flex items-center justify-center">
-            <Link
-              href="https://1.envato.market/prompt-tailwind"
-              target="_blank"
-              className="bg-primary w-full text-white p-3 rounded flex items-center justify-center text-sm"
-            >
-              Login
-            </Link>
-          </div>
+              )}
+            </li>
+            <li className="nav-item">
+              <Link
+                href="/text-practice"
+                className="nav-link text-lg font-medium"
+              >
+                Text Practice
+              </Link>
+            </li>
+            <div className="flex space-x-4">
+              <Link
+                href="/login"
+                className="bg-primary text-white px-4 py-3 rounded-lg text-center font-medium shadow-md hover:bg-primary-dark transition-colors flex-1"
+              >
+                Login
+              </Link>
+              <Link
+                href="/signup"
+                className="text-primary px-4 py-3 rounded-lg text-center border border-primary font-medium shadow-md hover:transition-colors flex-1"
+              >
+                Sign Up
+              </Link>
+            </div>
+          </ul>
         </div>
-      </div>
+      )}
     </>
   );
 };
