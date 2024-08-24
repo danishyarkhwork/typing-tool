@@ -82,7 +82,6 @@ const languageWords: Languages = {
       "conversation",
       "puzzle",
       "garden",
-      "window",
       "holiday",
       "balloon",
       "umbrella",
@@ -376,8 +375,6 @@ const TypingTest: React.FC = () => {
     highlightNextWord("");
   }, [typedWords, currentIndex]);
 
-  const shareUrl = window.location.href;
-
   return (
     <div className="p-6 max-w-5xl mx-auto my-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg space-y-8">
       {!isTyping && !gameOver && (
@@ -442,23 +439,7 @@ const TypingTest: React.FC = () => {
           <div className="text-2xl">
             Wrong words: <span className="text-red-500">{errors}</span>
           </div>
-          <div className="mt-4 flex justify-center space-x-4">
-            <FacebookShareButton url={shareUrl}>
-              <FacebookIcon size={40} round />
-            </FacebookShareButton>
-            <TwitterShareButton
-              url={shareUrl}
-              title={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
-            >
-              <TwitterIcon size={40} round />
-            </TwitterShareButton>
-            <WhatsappShareButton
-              url={shareUrl}
-              title={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
-            >
-              <WhatsappIcon size={40} round />
-            </WhatsappShareButton>
-          </div>
+
           <button
             onClick={handleRestart}
             className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 mt-4"
