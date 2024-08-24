@@ -4,25 +4,18 @@ import React, { useState, useEffect, useRef } from "react";
 import useSound from "use-sound";
 import Pusher from "pusher-js";
 
-const pusher = new Pusher("7e12b00a7da7645b9f48", {
-  cluster: "ap2",
-});
-
-interface PlayerData {
-  wpm: number;
-  wordIndex: number;
-  progress: number;
-}
-
-interface Players {
-  [key: string]: PlayerData;
-}
+// Define the Players type
+type Players = {
+  [username: string]: {
+    wpm: number;
+    wordIndex: number;
+    progress: number;
+  };
+};
 
 const MultiplayerTypingTest: React.FC = () => {
-  const [username, setUsername] = useState<string>(
-    () => localStorage.getItem("username") || ""
-  );
-  const [isJoined, setIsJoined] = useState<boolean>(!!username);
+  const [username, setUsername] = useState<string>("");
+  const [isJoined, setIsJoined] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
   const [wordIndex, setWordIndex] = useState<number>(0);
   const [correctWords, setCorrectWords] = useState<string[]>([]);
@@ -41,7 +34,21 @@ const MultiplayerTypingTest: React.FC = () => {
   const [playTypingSound] = useSound("/assets/keypress.wav", { volume: 0.5 });
 
   useEffect(() => {
-    if (isJoined) {
+    if (typeof window !== "undefined") {
+      const storedUsername = localStorage.getItem("username");
+      if (storedUsername) {
+        setUsername(storedUsername);
+        setIsJoined(true);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isJoined && typeof window !== "undefined") {
+      const pusher = new Pusher("7e12b00a7da7645b9f48", {
+        cluster: "ap2",
+      });
+
       const initialWords = "The quick brown fox jumps over the lazy dog".split(
         " "
       );
@@ -57,7 +64,10 @@ const MultiplayerTypingTest: React.FC = () => {
       channel.bind(
         "playerJoined",
         (data: { username: string; players: Players }) => {
-          setPlayers(data.players);
+          setPlayers((prevPlayers) => ({
+            ...prevPlayers,
+            ...data.players,
+          }));
           console.log(`${data.username} has joined the game!`);
         }
       );
@@ -102,12 +112,14 @@ const MultiplayerTypingTest: React.FC = () => {
     } else {
       calculateWpm();
     }
-  }, [isCompleted, correctWords.length]);
+  }, [isCompleted]);
 
   const handleJoin = () => {
     if (username.trim() !== "") {
       setIsJoined(true);
-      localStorage.setItem("username", username);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("username", username);
+      }
       fetch("/api/join", {
         method: "POST",
         headers: {
@@ -133,12 +145,12 @@ const MultiplayerTypingTest: React.FC = () => {
       setIsTyping(true);
     }
 
-    if (value.trim() === currentWord) {
+    if (value.trim() === currentWord && wordIndex < words.length) {
       const newWordIndex = wordIndex + 1;
-      setCorrectWords([...correctWords, currentWord]);
+      setCorrectWords((prev) => [...prev, currentWord]);
       setInput("");
       setWordIndex(newWordIndex);
-      setCurrentWord(words[newWordIndex]);
+      setCurrentWord(words[newWordIndex] || "");
 
       const newProgress = (newWordIndex / words.length) * 100;
       const newWpm = Math.round((correctWords.length + 1) / (timer / 60));
@@ -216,17 +228,39 @@ const MultiplayerTypingTest: React.FC = () => {
   };
 
   const renderPlayers = () => {
+    if (!players || Object.keys(players).length === 0) {
+      return (
+        <p className="text-center text-gray-500 mt-4">
+          No players have joined yet.
+        </p>
+      );
+    }
+
     return Object.keys(players).map((username) => (
       <div
         key={username}
         className="flex justify-between items-center mt-2 p-2 bg-gray-100 rounded-md"
       >
         <span className="text-lg font-semibold text-gray-700">{username}</span>
+        <div className="flex-1 mx-4">
+          <div
+            className="h-2 bg-gray-300 rounded"
+            style={{
+              width: "100%",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              className="h-full bg-blue-600"
+              style={{
+                width: `${players[username]?.progress || 0}%`,
+                transition: "width 0.4s ease",
+              }}
+            ></div>
+          </div>
+        </div>
         <span className="text-lg font-medium text-gray-600">
           {players[username]?.wpm || 0} WPM
-        </span>
-        <span className="text-sm text-gray-500">
-          {players[username]?.progress?.toFixed(2) || 0}%
         </span>
       </div>
     ));
