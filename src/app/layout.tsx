@@ -1,16 +1,12 @@
-import type { Metadata } from "next";
+"use client";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Asan Typing",
-  description: "Learn to Type Fast with Asan Typing",
-};
 
 export default function RootLayout({
   children,
@@ -31,9 +27,11 @@ export default function RootLayout({
       <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 
       <body className={inter.className}>
-        <Header />
-        {children}
-        <Footer />
+        <SessionProvider>
+          <Header />
+          {children}
+          <Footer />
+        </SessionProvider>
       </body>
 
       <Script src="assets/libs/@frostui/tailwindcss/frostui.js"></Script>

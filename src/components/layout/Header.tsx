@@ -1,13 +1,32 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Modal from "react-modal";
+import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [activeMobileDropdown, setActiveMobileDropdown] = useState(null);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [signupForm, setSignupForm] = useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+    agreeToPrivacy: false,
+  });
+  const [loginForm, setLoginForm] = useState({
+    email: "",
+    password: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
   const timeoutRef = useRef(null);
+
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +51,105 @@ const Header = () => {
 
   const toggleMobileDropdown = (menu) => {
     setActiveMobileDropdown(activeMobileDropdown === menu ? null : menu);
+  };
+
+  const openSignupModal = () => {
+    setIsSignupModalOpen(true);
+  };
+
+  const closeSignupModal = () => {
+    setIsSignupModalOpen(false);
+    setSignupForm({
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+      agreeToPrivacy: false,
+    });
+    setFormErrors({});
+  };
+
+  const openLoginModal = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setIsLoginModalOpen(false);
+    setLoginForm({
+      email: "",
+      password: "",
+    });
+    setFormErrors({});
+  };
+
+  const handleSignupChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setSignupForm({
+      ...signupForm,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleLoginChange = (e) => {
+    const { name, value } = e.target;
+    setLoginForm({
+      ...loginForm,
+      [name]: value,
+    });
+  };
+
+  const validateSignupForm = () => {
+    let errors = {};
+    if (!signupForm.name) errors.name = "Name is required";
+    if (!signupForm.username) errors.username = "Username is required";
+    if (!signupForm.email) errors.email = "Email is required";
+    if (!signupForm.password) errors.password = "Password is required";
+    if (!signupForm.agreeToPrivacy)
+      errors.agreeToPrivacy = "You must agree to the privacy policy";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    if (validateSignupForm()) {
+      try {
+        const response = await fetch("/api/user/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(signupForm),
+        });
+        if (response.ok) {
+          closeSignupModal();
+        } else {
+          const errorData = await response.json();
+          setFormErrors({ server: errorData.message });
+        }
+      } catch (error) {
+        setFormErrors({ server: "An error occurred. Please try again." });
+      }
+    }
+  };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: loginForm.email,
+        password: loginForm.password,
+      });
+
+      if (result.error) {
+        setFormErrors({ server: result.error });
+      } else {
+        closeLoginModal();
+      }
+    } catch (error) {
+      setFormErrors({ server: "An error occurred. Please try again." });
+    }
   };
 
   return (
@@ -132,18 +250,168 @@ const Header = () => {
           </div>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <Link
-              href="/login"
-              className="bg-primary text-white px-4 py-2 rounded-lg inline-flex items-center text-sm font-medium shadow-md hover:bg-primary-dark transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="text-primary px-4 py-2 rounded-lg border border-primary inline-flex items-center text-sm font-medium shadow-md hover:bg-primary hover:text-white transition-colors"
-            >
-              Sign Up
-            </Link>
+            {session ? (
+              <>
+                <div className="relative">
+                  <a
+                    href="javascript:void(0);"
+                    className="nav-link flex items-center"
+                    onClick={() =>
+                      setActiveDropdown(
+                        activeDropdown === "profile" ? null : "profile"
+                      )
+                    }
+                  >
+                    <div className="shrink">
+                      <div className="h-8 w-8 me-2">
+                        <img
+                          src={
+                            session.user.image ||
+                            "assets/images/avators/default-avatar.jpg"
+                          }
+                          className="avatar h-full w-full rounded-full me-2"
+                          alt="User Avatar"
+                        />
+                      </div>
+                    </div>
+                    <div className="hidden lg:block grow ms-1 leading-normal">
+                      <span className="block text-sm font-medium">
+                        {session.user.name}
+                      </span>
+                      <span className="block text-gray-400 text-xs">
+                        {session.user.role || "User"}
+                      </span>
+                    </div>
+                  </a>
+
+                  {activeDropdown === "profile" && (
+                    <div
+                      id="innerPageDropdownMenu"
+                      className="absolute right-0 mt-4 bg-white rounded-lg shadow-lg border p-2 w-56 z-50"
+                    >
+                      <div className="nav-item rounded hover:bg-gray-100 transition-all">
+                        <a className="nav-link flex items-center p-2" href="#">
+                          <svg
+                            className="h-5 w-5 text-gray-500 mr-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                          </svg>
+                          Profile
+                        </a>
+                      </div>
+
+                      <div className="nav-item rounded hover:bg-gray-100 transition-all">
+                        <a className="nav-link flex items-center p-2" href="#">
+                          <svg
+                            className="h-5 w-5 text-gray-500 mr-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                          </svg>
+                          Settings
+                        </a>
+                      </div>
+
+                      <div className="nav-item rounded hover:bg-gray-100 transition-all">
+                        <a className="nav-link flex items-center p-2" href="#">
+                          <svg
+                            className="h-5 w-5 text-gray-500 mr-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line
+                              x1="14.31"
+                              y1="8"
+                              x2="20.05"
+                              y2="17.94"
+                            ></line>
+                            <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+                            <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+                            <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+                            <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+                            <line
+                              x1="16.62"
+                              y1="12"
+                              x2="10.88"
+                              y2="21.94"
+                            ></line>
+                          </svg>
+                          Support
+                        </a>
+                      </div>
+
+                      <hr className="border-gray-200 my-2" />
+
+                      <div className="nav-item rounded hover:bg-gray-100 transition-all">
+                        <a
+                          className="nav-link flex items-center p-2"
+                          href="#"
+                          onClick={() => signOut()}
+                        >
+                          <svg
+                            className="h-5 w-5 text-gray-500 mr-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect
+                              x="3"
+                              y="11"
+                              width="18"
+                              height="11"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                          </svg>
+                          Sign Out
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={openLoginModal}
+                  className="bg-primary text-white px-4 py-2 rounded-lg inline-flex items-center text-sm font-medium shadow-md hover:bg-primary-dark transition-colors"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={openSignupModal}
+                  className="text-primary px-4 py-2 rounded-lg border border-primary inline-flex items-center text-sm font-medium shadow-md hover:bg-primary hover:text-white transition-colors"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
 
           <div className="lg:hidden flex items-center">
@@ -252,22 +520,232 @@ const Header = () => {
               </Link>
             </li>
             <div className="flex space-x-4">
-              <Link
-                href="/login"
-                className="bg-primary text-white px-4 py-3 rounded-lg text-center font-medium shadow-md hover:bg-primary-dark transition-colors flex-1"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="text-primary px-4 py-3 rounded-lg text-center border border-primary font-medium shadow-md hover:transition-colors flex-1"
-              >
-                Sign Up
-              </Link>
+              {session ? (
+                <button
+                  onClick={() => signOut()}
+                  className="bg-red-500 text-white px-4 py-3 rounded-lg text-center font-medium shadow-md hover:bg-red-600 transition-colors flex-1"
+                >
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={openLoginModal}
+                    className="bg-primary text-white px-4 py-3 rounded-lg text-center font-medium shadow-md hover:bg-primary-dark transition-colors flex-1"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={openSignupModal}
+                    className="text-primary px-4 py-3 rounded-lg text-center border border-primary font-medium shadow-md hover:transition-colors flex-1"
+                  >
+                    Sign Up
+                  </button>
+                </>
+              )}
             </div>
           </ul>
         </div>
       )}
+
+      <Modal
+        isOpen={isSignupModalOpen}
+        onRequestClose={closeSignupModal}
+        contentLabel="Sign Up"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          Sign Up
+        </h2>
+        <form onSubmit={handleSignupSubmit}>
+          {formErrors.server && (
+            <div className="text-red-500 text-sm mb-4">{formErrors.server}</div>
+          )}
+          <div className="mb-4 flex items-center">
+            <FaUser className="mr-2 text-gray-500" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={signupForm.name}
+              onChange={handleSignupChange}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+            />
+          </div>
+          {formErrors.name && (
+            <div className="text-red-500 text-sm mb-4">{formErrors.name}</div>
+          )}
+          <div className="mb-4 flex items-center">
+            <FaUser className="mr-2 text-gray-500" />
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={signupForm.username}
+              onChange={handleSignupChange}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+            />
+          </div>
+          {formErrors.username && (
+            <div className="text-red-500 text-sm mb-4">
+              {formErrors.username}
+            </div>
+          )}
+          <div className="mb-4 flex items-center">
+            <FaEnvelope className="mr-2 text-gray-500" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={signupForm.email}
+              onChange={handleSignupChange}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+            />
+          </div>
+          {formErrors.email && (
+            <div className="text-red-500 text-sm mb-4">{formErrors.email}</div>
+          )}
+          <div className="mb-4 flex items-center">
+            <FaLock className="mr-2 text-gray-500" />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={signupForm.password}
+              onChange={handleSignupChange}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+            />
+          </div>
+          {formErrors.password && (
+            <div className="text-red-500 text-sm mb-4">
+              {formErrors.password}
+            </div>
+          )}
+          <div className="mb-4 flex items-center">
+            <input
+              type="checkbox"
+              name="agreeToPrivacy"
+              checked={signupForm.agreeToPrivacy}
+              onChange={handleSignupChange}
+              className="mr-2"
+            />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              I agree to the Privacy Policy
+            </span>
+          </div>
+          {formErrors.agreeToPrivacy && (
+            <div className="text-red-500 text-sm mb-4">
+              {formErrors.agreeToPrivacy}
+            </div>
+          )}
+          <div className="flex justify-between mt-6">
+            <button
+              type="button"
+              onClick={closeSignupModal}
+              className="p-3 bg-red-500 text-white rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+            >
+              Sign Up
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={isLoginModalOpen}
+        onRequestClose={closeLoginModal}
+        contentLabel="Login"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          Login
+        </h2>
+        <form onSubmit={handleLoginSubmit}>
+          {formErrors.server && (
+            <div className="text-red-500 text-sm mb-4">{formErrors.server}</div>
+          )}
+          <div className="mb-4 flex items-center">
+            <FaEnvelope className="mr-2 text-gray-500" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={loginForm.email}
+              onChange={handleLoginChange}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+            />
+          </div>
+          {formErrors.email && (
+            <div className="text-red-500 text-sm mb-4">{formErrors.email}</div>
+          )}
+          <div className="mb-4 flex items-center">
+            <FaLock className="mr-2 text-gray-500" />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={loginForm.password}
+              onChange={handleLoginChange}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+            />
+          </div>
+          {formErrors.password && (
+            <div className="text-red-500 text-sm mb-4">
+              {formErrors.password}
+            </div>
+          )}
+          <div className="flex justify-between mt-6">
+            <button
+              type="button"
+              onClick={closeLoginModal}
+              className="p-3 bg-red-500 text-white rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+            >
+              Login
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <style jsx global>{`
+        .Modal {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          right: auto;
+          bottom: auto;
+          margin-right: -50%;
+          transform: translate(-50%, -50%);
+          background-color: #ffffff;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          max-width: 500px;
+          width: 100%;
+        }
+
+        .Overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.75);
+          z-index: 9999;
+        }
+      `}</style>
     </>
   );
 };
