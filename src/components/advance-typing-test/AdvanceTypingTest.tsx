@@ -7,12 +7,13 @@ import { useWindowSize } from "react-use";
 
 const textSamples = {
   easy: {
-    english: `The cat sat on the mat.`,
-    pashto: `پشۍ په توشک ناست و.`,
+    english: "The cat sat on the mat.",
+    pashto: "پشۍ په توشک ناست و.",
   },
   medium: {
-    english: `Oil and water don't mix. You have probably heard this old saying.`,
-    pashto: `تیل او اوبه یوځای نشي. تاسو به شاید دا زوړ خبره اورېدلې وي.`,
+    english:
+      "Oil and water don't mix. You have probably heard this old saying.",
+    pashto: "تیل او اوبه یوځای نشي. تاسو به شاید دا زوړ خبره اورېدلې وي.",
   },
   hard: {
     english: `Oil and water don't mix. You have probably heard this old saying. It isn't just folk wisdom, however. It's chemistry. Another common expression, "like water off of a duck's back," illustrates the same basic principle.`,
@@ -26,6 +27,9 @@ const pashtoKeyboard = {
   row3: "ط ظ ز ژ ږ پ و ۍ د ر ذ".split(" "),
 };
 
+type Difficulty = keyof typeof textSamples;
+type Language = keyof (typeof textSamples)[Difficulty];
+
 const AdvanceTypingTest = () => {
   const [input, setInput] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
@@ -38,8 +42,8 @@ const AdvanceTypingTest = () => {
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [language, setLanguage] = useState("english");
-  const [difficulty, setDifficulty] = useState("medium");
+  const [language, setLanguage] = useState<Language>("english");
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [showSettings, setShowSettings] = useState(true);
   const [achievement, setAchievement] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -243,7 +247,7 @@ const AdvanceTypingTest = () => {
                 <label className="block mb-2 text-lg">Select Language:</label>
                 <select
                   value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
+                  onChange={(e) => setLanguage(e.target.value as Language)}
                   className="w-full p-3 rounded bg-gray-200 text-gray-900"
                 >
                   <option value="english">English</option>
@@ -254,7 +258,7 @@ const AdvanceTypingTest = () => {
                 <label className="block mb-2 text-lg">Select Difficulty:</label>
                 <select
                   value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
+                  onChange={(e) => setDifficulty(e.target.value as Difficulty)}
                   className="w-full p-3 rounded bg-gray-200 text-gray-900"
                 >
                   <option value="easy">Easy</option>

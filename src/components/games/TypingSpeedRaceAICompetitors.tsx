@@ -55,6 +55,9 @@ const sentenceLists = {
   },
 };
 
+type Language = keyof typeof sentenceLists; // "english" | "pashto"
+type Difficulty = keyof (typeof sentenceLists)[Language]; // "easy" | "medium" | "hard"
+
 const AICompetitors = [
   { name: "Speedy Bot", speed: 250 }, // Characters per minute
   { name: "Pro Typist", speed: 200 },
@@ -70,8 +73,8 @@ const TypingRaceGame: React.FC = () => {
   const [playerProgress, setPlayerProgress] = useState<number>(0);
   const [aiProgress, setAiProgress] = useState<Record<string, number>>({});
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [difficulty, setDifficulty] = useState<string>("medium");
-  const [language, setLanguage] = useState<string>("english");
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+  const [language, setLanguage] = useState<Language>("english");
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [winner, setWinner] = useState<string | null>(null);
 
@@ -217,7 +220,7 @@ const TypingRaceGame: React.FC = () => {
             <div className="flex justify-center space-x-4 mb-6">
               <select
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={(e) => setLanguage(e.target.value as Language)}
                 className="p-3 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900"
               >
                 <option value="english">English</option>
@@ -225,7 +228,7 @@ const TypingRaceGame: React.FC = () => {
               </select>
               <select
                 value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
+                onChange={(e) => setDifficulty(e.target.value as Difficulty)}
                 className="p-3 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900"
               >
                 <option value="easy">Easy</option>
@@ -242,7 +245,7 @@ const TypingRaceGame: React.FC = () => {
             </button>
           </div>
         </>
-      )}{" "}
+      )}
       {gameOver && (
         <div className="text-center">
           <Confetti width={width} height={height} />

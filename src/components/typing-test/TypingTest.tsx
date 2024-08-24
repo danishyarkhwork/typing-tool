@@ -443,10 +443,7 @@ const TypingTest: React.FC = () => {
             Wrong words: <span className="text-red-500">{errors}</span>
           </div>
           <div className="mt-4 flex justify-center space-x-4">
-            <FacebookShareButton
-              url={shareUrl}
-              quote={`I scored ${wpm} WPM with ${accuracy}% accuracy!`}
-            >
+            <FacebookShareButton url={shareUrl}>
               <FacebookIcon size={40} round />
             </FacebookShareButton>
             <TwitterShareButton

@@ -8,8 +8,10 @@ import { signIn, signOut, useSession } from "next-auth/react";
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
-  const [activeMobileDropdown, setActiveMobileDropdown] = useState(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [activeMobileDropdown, setActiveMobileDropdown] = useState<
+    string | null
+  >(null);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [signupForm, setSignupForm] = useState({
@@ -24,7 +26,7 @@ const Header = () => {
     password: "",
   });
   const [formErrors, setFormErrors] = useState({});
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { data: session } = useSession();
 
@@ -36,7 +38,7 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleMouseEnter = (menu) => {
+  const handleMouseEnter = (menu: string) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -49,7 +51,7 @@ const Header = () => {
     }, 200);
   };
 
-  const toggleMobileDropdown = (menu) => {
+  const toggleMobileDropdown = (menu: string) => {
     setActiveMobileDropdown(activeMobileDropdown === menu ? null : menu);
   };
 
@@ -82,7 +84,7 @@ const Header = () => {
     setFormErrors({});
   };
 
-  const handleSignupChange = (e) => {
+  const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setSignupForm({
       ...signupForm,
@@ -90,7 +92,7 @@ const Header = () => {
     });
   };
 
-  const handleLoginChange = (e) => {
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginForm({
       ...loginForm,
@@ -99,7 +101,7 @@ const Header = () => {
   };
 
   const validateSignupForm = () => {
-    let errors = {};
+    let errors: { [key: string]: string } = {};
     if (!signupForm.name) errors.name = "Name is required";
     if (!signupForm.username) errors.username = "Username is required";
     if (!signupForm.email) errors.email = "Email is required";
@@ -110,7 +112,7 @@ const Header = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSignupSubmit = async (e) => {
+  const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateSignupForm()) {
       try {
@@ -133,7 +135,7 @@ const Header = () => {
     }
   };
 
-  const handleLoginSubmit = async (e) => {
+  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const result = await signIn("credentials", {
@@ -142,7 +144,7 @@ const Header = () => {
         password: loginForm.password,
       });
 
-      if (result.error) {
+      if (result?.error) {
         setFormErrors({ server: result.error });
       } else {
         closeLoginModal();
@@ -264,24 +266,41 @@ const Header = () => {
                   >
                     <div className="shrink">
                       <div className="h-8 w-8 me-2">
-                        <img
-                          src={
-                            session.user.image ||
-                            "assets/images/avators/default-avatar.jpg"
-                          }
-                          className="avatar h-full w-full rounded-full me-2"
-                          alt="User Avatar"
-                        />
+                        {session?.user ? (
+                          <img
+                            src={
+                              session.user.image ||
+                              "assets/images/avators/default-avatar.jpg"
+                            }
+                            className="avatar h-full w-full rounded-full me-2"
+                            alt="User Avatar"
+                          />
+                        ) : (
+                          <img
+                            src="assets/images/avators/default-avatar.jpg"
+                            className="avatar h-full w-full rounded-full me-2"
+                            alt="Default Avatar"
+                          />
+                        )}
                       </div>
                     </div>
-                    <div className="hidden lg:block grow ms-1 leading-normal">
-                      <span className="block text-sm font-medium">
-                        {session.user.name}
-                      </span>
-                      <span className="block text-gray-400 text-xs">
-                        {session.user.role || "User"}
-                      </span>
-                    </div>
+                    {session?.user ? (
+                      <div className="hidden lg:block grow ms-1 leading-normal">
+                        <span className="block text-sm font-medium">
+                          {session.user.name}
+                        </span>
+                        <span className="block text-gray-400 text-xs">
+                          User
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="hidden lg:block grow ms-1 leading-normal">
+                        <span className="block text-sm font-medium">Guest</span>
+                        <span className="block text-gray-400 text-xs">
+                          User
+                        </span>
+                      </div>
+                    )}
                   </a>
 
                   {activeDropdown === "profile" && (
@@ -548,7 +567,7 @@ const Header = () => {
         </div>
       )}
 
-      <Modal
+      {/* <Modal
         isOpen={isSignupModalOpen}
         onRequestClose={closeSignupModal}
         contentLabel="Sign Up"
@@ -717,7 +736,7 @@ const Header = () => {
             </button>
           </div>
         </form>
-      </Modal>
+      </Modal> */}
 
       <style jsx global>{`
         .Modal {

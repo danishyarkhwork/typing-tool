@@ -31,6 +31,8 @@ const wordLists = {
   ],
 };
 
+type Language = keyof typeof wordLists;
+
 type Word = {
   id: string;
   text: string;
@@ -51,7 +53,7 @@ const WordFallGame: React.FC = () => {
   const [gameDuration, setGameDuration] = useState(60);
   const [timeLeft, setTimeLeft] = useState(gameDuration);
   const [highScores, setHighScores] = useState<number[]>([]);
-  const [language, setLanguage] = useState("english");
+  const [language, setLanguage] = useState<Language>("english");
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
@@ -227,7 +229,7 @@ const WordFallGame: React.FC = () => {
               <select
                 id="language"
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={(e) => setLanguage(e.target.value as Language)}
                 className="p-2 bg-gray-800 border-2 border-gray-600 rounded text-white"
               >
                 <option value="english">English</option>
