@@ -2,51 +2,71 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import useSound from "use-sound";
-import io from "socket.io-client"; // Import socket.io-client for real-time communication
+import Pusher from "pusher-js";
 
-const socket = io("http://localhost:3000"); // Replace with your server URL
+const pusher = new Pusher("7e12b00a7da7645b9f48", {
+  cluster: "ap2",
+});
 
-const MultiplayerTypingTest = () => {
-  const [input, setInput] = useState("");
-  const [wordIndex, setWordIndex] = useState(0);
+interface PlayerData {
+  wpm: number;
+  wordIndex: number;
+  progress: number;
+}
+
+interface Players {
+  [key: string]: PlayerData;
+}
+
+const MultiplayerTypingTest: React.FC = () => {
+  const [username, setUsername] = useState<string>(
+    () => localStorage.getItem("username") || ""
+  );
+  const [isJoined, setIsJoined] = useState<boolean>(!!username);
+  const [input, setInput] = useState<string>("");
+  const [wordIndex, setWordIndex] = useState<number>(0);
   const [correctWords, setCorrectWords] = useState<string[]>([]);
   const [currentWord, setCurrentWord] = useState<string>("");
   const [words, setWords] = useState<string[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [timer, setTimer] = useState(0);
-  const [errors, setErrors] = useState(0);
-  const [wpm, setWpm] = useState(0);
-  const [accuracy, setAccuracy] = useState(100);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [players, setPlayers] = useState([]);
-  const [playerData, setPlayerData] = useState({});
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [timer, setTimer] = useState<number>(0);
+  const [errors, setErrors] = useState<number>(0);
+  const [wpm, setWpm] = useState<number>(0);
+  const [accuracy, setAccuracy] = useState<number>(100);
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [players, setPlayers] = useState<Players>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
+  const [playTypingSound] = useSound("/assets/keypress.wav", { volume: 0.5 });
 
   useEffect(() => {
-    // Initialize words (could be fetched from a server)
-    const initialWords = "The quick brown fox jumps over the lazy dog".split(
-      " "
-    );
-    setWords(initialWords);
-    setCurrentWord(initialWords[0]);
+    if (isJoined) {
+      const initialWords = "The quick brown fox jumps over the lazy dog".split(
+        " "
+      );
+      setWords(initialWords);
+      setCurrentWord(initialWords[0]);
 
-    // Listen for other players' data
-    socket.on("updatePlayers", (players) => {
-      setPlayers(players);
-    });
+      const channel = pusher.subscribe("typing-test");
 
-    socket.on("playerData", (data) => {
-      setPlayerData(data);
-    });
+      channel.bind("updatePlayers", (data: { players: Players }) => {
+        setPlayers(data.players);
+      });
 
-    return () => {
-      socket.off("updatePlayers");
-      socket.off("playerData");
-    };
-  }, []);
+      channel.bind(
+        "playerJoined",
+        (data: { username: string; players: Players }) => {
+          setPlayers(data.players);
+          console.log(`${data.username} has joined the game!`);
+        }
+      );
+
+      return () => {
+        pusher.unsubscribe("typing-test");
+      };
+    }
+  }, [isJoined]);
 
   useEffect(() => {
     if (isTyping) {
@@ -62,11 +82,46 @@ const MultiplayerTypingTest = () => {
   useEffect(() => {
     if (isCompleted) {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      socket.emit("playerFinished", { wpm, accuracy });
+      fetch("/api/playerFinished", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, wpm, accuracy }),
+      }).then(() => {
+        // Congratulatory effect
+        const confetti = document.createElement("div");
+        confetti.innerText = "🎉 Congratulations! 🎉";
+        confetti.className =
+          "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl";
+        document.body.appendChild(confetti);
+        setTimeout(() => {
+          document.body.removeChild(confetti);
+        }, 3000);
+      });
     } else {
       calculateWpm();
     }
   }, [isCompleted, correctWords.length]);
+
+  const handleJoin = () => {
+    if (username.trim() !== "") {
+      setIsJoined(true);
+      localStorage.setItem("username", username);
+      fetch("/api/join", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username }),
+      }).then(() => {
+        setPlayers((prevPlayers) => ({
+          ...prevPlayers,
+          [username]: { wpm: 0, wordIndex: 0, progress: 0 },
+        }));
+      });
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -79,12 +134,38 @@ const MultiplayerTypingTest = () => {
     }
 
     if (value.trim() === currentWord) {
+      const newWordIndex = wordIndex + 1;
       setCorrectWords([...correctWords, currentWord]);
       setInput("");
-      setWordIndex((prev) => prev + 1);
-      setCurrentWord(words[wordIndex + 1]);
-      socket.emit("updatePlayer", { wpm, wordIndex: wordIndex + 1 });
-      if (wordIndex + 1 === words.length) {
+      setWordIndex(newWordIndex);
+      setCurrentWord(words[newWordIndex]);
+
+      const newProgress = (newWordIndex / words.length) * 100;
+      const newWpm = Math.round((correctWords.length + 1) / (timer / 60));
+
+      fetch("/api/updatePlayer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          wpm: newWpm,
+          wordIndex: newWordIndex,
+          progress: newProgress,
+        }),
+      });
+
+      setPlayers((prevPlayers) => ({
+        ...prevPlayers,
+        [username]: {
+          wpm: newWpm,
+          wordIndex: newWordIndex,
+          progress: newProgress,
+        },
+      }));
+
+      if (newWordIndex === words.length) {
         setIsCompleted(true);
       }
     } else if (value.length >= currentWord.length) {
@@ -135,61 +216,91 @@ const MultiplayerTypingTest = () => {
   };
 
   const renderPlayers = () => {
-    return players.map((player) => (
-      <div key={player.username} className="flex justify-between mt-2">
-        <span>{player.username}</span>
-        <span>{playerData[player.username]?.wpm || 0} WPM</span>
-        <span>
-          {((playerData[player.username]?.wordIndex || 0) / words.length) * 100}
-          %
+    return Object.keys(players).map((username) => (
+      <div
+        key={username}
+        className="flex justify-between items-center mt-2 p-2 bg-gray-100 rounded-md"
+      >
+        <span className="text-lg font-semibold text-gray-700">{username}</span>
+        <span className="text-lg font-medium text-gray-600">
+          {players[username]?.wpm || 0} WPM
+        </span>
+        <span className="text-sm text-gray-500">
+          {players[username]?.progress?.toFixed(2) || 0}%
         </span>
       </div>
     ));
   };
 
   return (
-    <div
-      className="max-w-5xl flex flex-col justify-center text-gray-900 transition-all duration-300"
-      onClick={() => inputRef.current?.focus()}
-    >
-      {isCompleted && <h2 className="text-center text-3xl">Test Completed!</h2>}
-      <div className="bg-white shadow-lg mt-6 rounded-lg p-4 w-full max-w-6xl overflow-auto transition-all duration-300">
-        <div className="text-2xl flex flex-wrap font-mono leading-relaxed">
-          {renderText()}
+    <div className="max-w-5xl mx-auto flex flex-col items-center justify-center text-gray-900 py-8">
+      {!isJoined ? (
+        <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-bold mb-4 text-gray-700">
+            Join the Game
+          </h2>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
+            className="w-full p-3 border-2 border-gray-300 rounded-lg mb-4"
+          />
+          <button
+            onClick={handleJoin}
+            className="w-full bg-blue-500 text-white p-3 rounded-lg"
+          >
+            Join Game
+          </button>
         </div>
-      </div>
+      ) : (
+        <>
+          {isCompleted && (
+            <h2 className="text-center text-3xl font-bold text-green-600 mb-6">
+              Test Completed!
+            </h2>
+          )}
+          <div className="bg-white shadow-lg mt-6 rounded-lg p-6 w-full max-w-6xl overflow-auto">
+            <div className="text-2xl flex flex-wrap font-mono leading-relaxed">
+              {renderText()}
+            </div>
+          </div>
 
-      <input
-        type="text"
-        value={input}
-        onChange={handleChange}
-        className="mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono"
-        placeholder="Start typing here..."
-        ref={inputRef}
-        autoFocus
-        disabled={isCompleted}
-      />
+          <input
+            type="text"
+            value={input}
+            onChange={handleChange}
+            className="mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none font-mono"
+            placeholder="Start typing here..."
+            ref={inputRef}
+            autoFocus
+            disabled={isCompleted}
+          />
 
-      <div className="w-full max-w-4xl h-2 bg-gray-300 rounded mt-2">
-        <div
-          className="h-full bg-blue-600 rounded"
-          style={{ width: `${(wordIndex / words.length) * 100}%` }}
-        ></div>
-      </div>
+          <div className="w-full max-w-4xl h-2 bg-gray-300 rounded mt-4">
+            <div
+              className="h-full bg-blue-600 rounded"
+              style={{ width: `${(wordIndex / words.length) * 100}%` }}
+            ></div>
+          </div>
 
-      <div className="mt-10 w-full max-w-5xl text-lg">
-        <div className="flex justify-between">
-          <p>Time: {timer}s</p>
-          <p>WPM: {wpm}</p>
-          <p>Accuracy: {accuracy.toFixed(2)}%</p>
-          <p>Errors: {errors}</p>
-        </div>
-      </div>
+          <div className="mt-10 w-full max-w-5xl text-lg">
+            <div className="flex justify-between text-gray-700">
+              <p>Time: {timer}s</p>
+              <p>WPM: {wpm}</p>
+              <p>Accuracy: {accuracy.toFixed(2)}%</p>
+              <p>Errors: {errors}</p>
+            </div>
+          </div>
 
-      <div className="mt-10">
-        <h3 className="text-2xl mb-4">Other Players</h3>
-        {renderPlayers()}
-      </div>
+          <div className="mt-10 w-full max-w-5xl">
+            <h3 className="text-2xl font-bold mb-4 text-gray-700">
+              Other Players
+            </h3>
+            {renderPlayers()}
+          </div>
+        </>
+      )}
     </div>
   );
 };
