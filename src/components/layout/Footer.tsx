@@ -130,8 +130,8 @@ const Footer = () => {
                 Khalid Danishyar
               </a>
             </p>
-            <p>
-              <ul className="flex space-x-3">
+            <p className=" sm:mt-5 lg:mt-0 md:mt-0">
+              <ul className="flex lg:space-x-3 sm:space-x-0 md:space-x-3">
                 <li>
                   <Link
                     href="#"
