@@ -168,12 +168,12 @@ const Header = () => {
           <Link href="/" className="flex items-center">
             <img
               src="assets/images/logo-dark.png"
-              className="h-8 logo-dark"
+              className="h-10 logo-dark"
               alt="Logo Dark"
             />
             <img
               src="assets/images/logo-light.png"
-              className="h-8 logo-light"
+              className="h-10 logo-light"
               alt="Logo Light"
             />
           </Link>

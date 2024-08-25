@@ -10,14 +10,15 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <Link href="/">
               <img
-                src="assets/images/logo-dark.png"
+                src="assets/images/logo-light.png"
                 className="h-12 mb-6"
                 alt="Logo"
               />
             </Link>
             <p className="text-gray-400 leading-relaxed max-w-sm">
-              Elevate your web presence with a high-quality landing page that
-              captures attention and drives engagement.
+              Join thousands of users who are improving their typing skills
+              every day with Asan Typing. Start practicing today and unlock your
+              full potential!
             </p>
           </div>
 
@@ -116,10 +117,10 @@ const Footer = () => {
             <p className="sm:mb-4 lg:mb-0 text-center md:text-left lg:text-left">
               © 2024{" "}
               <a
-                href="#"
+                href="https://asantyping.com"
                 className="text-white hover:text-primary transition-colors duration-200"
               >
-                Typing Tests
+                Asan Typing
               </a>
               . All rights reserved. Powered by{" "}
               <a

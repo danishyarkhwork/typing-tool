@@ -249,7 +249,8 @@ const TypingTest: React.FC = () => {
     if (!isTyping) setIsTyping(true);
     const value = e.target.value;
 
-    playTypingSound();
+    console.log("Typing sound should play now."); // Debugging line
+    playTypingSound(); // Play sound
 
     if (value.endsWith(" ")) {
       const trimmedValue = value.trim();
