@@ -211,6 +211,14 @@ const Header = () => {
                         Custom Typing Test
                       </Link>
                     </div>
+                    <li className="nav-item">
+                      <Link
+                        className="nav-link"
+                        href="/multiplayer-typing-test"
+                      >
+                        Multiplayer Typing
+                      </Link>
+                    </li>
                   </div>
                 )}
               </li>
@@ -243,10 +251,29 @@ const Header = () => {
                   </div>
                 )}
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" href="/multiplayer-typing-test">
-                  Multiplayer Typing Test
-                </Link>
+              <li
+                className="nav-item relative"
+                onMouseEnter={() => handleMouseEnter("coding")}
+                onMouseLeave={handleMouseLeave}
+              >
+                <a className="nav-link cursor-pointer">
+                  Coding{" "}
+                  <i className="fa-solid fa-angle-down ms-2 align-middle"></i>
+                </a>
+                {activeDropdown === "coding" && (
+                  <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-lg border p-2 w-48">
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/html-typing">
+                        HTML
+                      </Link>
+                    </div>
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/css-typing">
+                        CSS
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </li>
             </ul>
           </div>
@@ -495,6 +522,14 @@ const Header = () => {
                       Advanced Test
                     </Link>
                   </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link text-lg font-medium"
+                      href="/multiplayer-typing-test"
+                    >
+                      Multiplayer Typing
+                    </Link>
+                  </li>
                 </ul>
               )}
             </li>
@@ -531,13 +566,33 @@ const Header = () => {
               )}
             </li>
             <li className="nav-item">
-              <Link
-                className="nav-link text-lg font-medium"
-                href="/multiplayer-typing-test"
+              <button
+                className="nav-link text-lg font-medium flex justify-between items-center w-full"
+                onClick={() => toggleMobileDropdown("coding")}
               >
-                Multiplayer Typing Test
-              </Link>
+                Coding
+                <i
+                  className={`fa-solid fa-angle-down ${
+                    activeMobileDropdown === "coding" ? "rotate-180" : ""
+                  } transition-transform`}
+                ></i>
+              </button>
+              {activeMobileDropdown === "coding" && (
+                <ul className="pl-4 mt-2 space-y-2">
+                  <li>
+                    <Link className="nav-link" href="/html-typing">
+                      HTML
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="nav-link" href="/css-typing">
+                      CSS
+                    </Link>
+                  </li>
+                </ul>
+              )}
             </li>
+
             <div className="flex space-x-4">
               {session ? (
                 <button
