@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  FacebookShareButton,
-  TwitterShareButton,
-  WhatsappShareButton,
-  FacebookIcon,
-  TwitterIcon,
-  WhatsappIcon,
-} from "react-share";
+import "@/styles/typing-test-page.css";
 import useSound from "use-sound";
 
 // Define type for languageWords
@@ -378,50 +371,67 @@ const TypingTest: React.FC = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto my-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg space-y-8">
+      {/* Settings Section */}
       {!isTyping && !gameOver && (
         <div className="flex flex-col items-center space-y-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">
             Typing Test Settings
           </h1>
           <div className="flex flex-wrap justify-center space-x-4 space-y-4 md:space-y-0">
-            <select
-              value={selectedTime}
-              onChange={handleTimeChange}
-              className="p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-            >
-              <option value={30}>30 seconds</option>
-              <option value={60}>60 seconds</option>
-              <option value={120}>120 seconds</option>
-            </select>
+            <div className="relative">
+              <label className="block mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+                Time:
+              </label>
+              <select
+                value={selectedTime}
+                onChange={handleTimeChange}
+                className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                <option value={30}>30 seconds</option>
+                <option value={60}>60 seconds</option>
+                <option value={120}>120 seconds</option>
+              </select>
+            </div>
 
-            <select
-              value={difficulty}
-              onChange={handleDifficultyChange}
-              className="p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="complex">Complex</option>
-            </select>
+            <div className="relative">
+              <label className="block mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+                Difficulty:
+              </label>
+              <select
+                value={difficulty}
+                onChange={handleDifficultyChange}
+                className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="complex">Complex</option>
+              </select>
+            </div>
 
-            <select
-              value={language}
-              onChange={handleLanguageChange}
-              className="p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-            >
-              <option value="english">English</option>
-              <option value="pashto">Pashto</option>
-            </select>
+            <div className="relative">
+              <label className="block mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+                Language:
+              </label>
+              <select
+                value={language}
+                onChange={handleLanguageChange}
+                className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                <option value="english">English</option>
+                <option value="pashto">Pashto</option>
+              </select>
+            </div>
           </div>
           <button
             onClick={handleStartTest}
-            className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+            className="p-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
           >
             Start Test
           </button>
         </div>
       )}
 
+      {/* Game Over Section */}
       {gameOver && (
         <div className="text-center space-y-6">
           <h2 className="text-5xl font-bold text-green-500">{wpm} WPM</h2>
@@ -443,20 +453,21 @@ const TypingTest: React.FC = () => {
 
           <button
             onClick={handleRestart}
-            className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 mt-4"
+            className="p-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 mt-4"
           >
             Restart Test
           </button>
         </div>
       )}
 
+      {/* Typing Area */}
       {isTyping && !gameOver && (
         <>
           <div
             id="words"
-            className={`text-4xl font-mono whitespace-pre-wrap leading-relaxed tracking-wide ${
+            className={`text-4xl font-semibold font-mono whitespace-pre-wrap leading-relaxed tracking-wide ${
               language === "pashto" ? "text-right" : "text-left"
-            }`}
+            } relative p-3 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-inner`}
             dir={language === "pashto" ? "rtl" : "ltr"}
             ref={textRef}
           >
@@ -465,29 +476,30 @@ const TypingTest: React.FC = () => {
               const wordClass =
                 typedWords[absoluteIndex] &&
                 typedWords[absoluteIndex] === text[absoluteIndex]
-                  ? "text-green-500"
+                  ? "text-green-600 font-bold"
                   : typedWords[absoluteIndex]
-                  ? "text-red-500"
-                  : "";
+                  ? "text-red-600 font-bold"
+                  : "text-gray-700 dark:text-gray-300";
               return (
                 <span
                   key={index}
                   className={`${
                     absoluteIndex === currentIndex
-                      ? "bg-gray-200 dark:bg-gray-600 px-1 rounded"
+                      ? "bg-blue-200 dark:bg-blue-700 px-2 py-1 rounded transition-colors duration-300"
                       : wordClass
-                  }`}
+                  } mr-2`}
                 >
                   {word}{" "}
                 </span>
               );
             })}
           </div>
+
           <input
             type="text"
             value={input}
             onChange={handleChange}
-            className={`w-full p-3 mt-4 border border-gray-300 dark:border-gray-600 rounded text-4xl font-mono bg-gray-100 dark:bg-gray-700 ${
+            className={`w-full p-3 mt-4 border border-gray-300 dark:border-gray-600 rounded-lg text-4xl font-mono bg-gray-100 dark:bg-gray-700 ${
               language === "pashto" ? "text-right" : "text-left"
             }`}
             placeholder={
@@ -509,6 +521,7 @@ const TypingTest: React.FC = () => {
         </>
       )}
 
+      {/* Typing History and Leaderboard */}
       {history.length > 0 && (
         <div className="mt-6">
           <h2 className="text-2xl font-semibold">Typing History</h2>

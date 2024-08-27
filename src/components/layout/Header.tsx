@@ -275,6 +275,12 @@ const Header = () => {
                   </div>
                 )}
               </li>
+
+              <li className="nav-item">
+                <Link className="nav-link" href="/blog">
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -591,6 +597,12 @@ const Header = () => {
                   </li>
                 </ul>
               )}
+            </li>
+
+            <li className="nav-item">
+              <Link className="nav-link" href="/blog">
+                Blog
+              </Link>
             </li>
 
             <div className="flex space-x-4">
