@@ -181,28 +181,95 @@ const AdvanceTypingTest = () => {
     const nextChar = currentWord.charAt(input.length);
     const isUpperCase = nextChar === nextChar.toUpperCase();
 
-    const keysRow1 =
-      language === "pashto" ? pashtoKeyboard.row1 : "QWERTYUIOP".split("");
-    const keysRow2 =
-      language === "pashto" ? pashtoKeyboard.row2 : "ASDFGHJKL".split("");
-    const keysRow3 =
-      language === "pashto" ? pashtoKeyboard.row3 : "ZXCVBNM".split("");
+    const keysRow1 = [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "0",
+      "-",
+      "=",
+      "Backspace",
+    ];
+    const keysRow2 = [
+      "Tab",
+      "Q",
+      "W",
+      "E",
+      "R",
+      "T",
+      "Y",
+      "U",
+      "I",
+      "O",
+      "P",
+      "[",
+      "]",
+      "\\",
+    ];
+    const keysRow3 = [
+      "Caps",
+      "A",
+      "S",
+      "D",
+      "F",
+      "G",
+      "H",
+      "J",
+      "K",
+      "L",
+      ";",
+      "'",
+      "Enter",
+    ];
+    const keysRow4 = [
+      "Shift",
+      "Z",
+      "X",
+      "C",
+      "V",
+      "B",
+      "N",
+      "M",
+      ",",
+      ".",
+      "/",
+      "Shift",
+    ];
+    const spaceKey = ["Space"]; // Representing the space bar
 
-    const renderKeys = (keys: string[]) => {
+    const renderKeys = (keys: any[], isSpecialRow = false) => {
       return keys.map((key) => {
         const displayKey = isUpperCase ? key.toUpperCase() : key.toLowerCase();
         const isActive = input.slice(-1).toUpperCase() === key.toUpperCase();
         const isNextKey = nextChar.toUpperCase() === key.toUpperCase();
+        const isSpecialKey = [
+          "Backspace",
+          "Tab",
+          "Caps Lock",
+          "Enter",
+          "Shift",
+          "Space",
+        ].includes(key);
+
+        let keyStyle = "key";
+        if (isSpecialKey) {
+          keyStyle += " special-key"; // Special styling for larger keys
+          if (key === "Space") {
+            keyStyle += " space-key"; // Smaller space bar
+          }
+        }
 
         return (
           <span
             key={key}
-            className={`p-4 m-2 rounded text-2xl ${
-              isActive
-                ? "bg-blue-700 text-white"
-                : isNextKey
-                ? "bg-yellow-500 text-white animate-pulse"
-                : "bg-gray-300 text-black"
+            className={`${keyStyle} ${isNextKey ? "next-key" : "default-key"} ${
+              isActive ? "active-key" : ""
             }`}
           >
             {displayKey}
@@ -212,10 +279,12 @@ const AdvanceTypingTest = () => {
     };
 
     return (
-      <div className="flex flex-col items-center mt-8">
-        <div className="flex">{renderKeys(keysRow1)}</div>
-        <div className="flex">{renderKeys(keysRow2)}</div>
-        <div className="flex">{renderKeys(keysRow3)}</div>
+      <div className="keyboard-container">
+        <div className="keyboard-row">{renderKeys(keysRow1)}</div>
+        <div className="keyboard-row">{renderKeys(keysRow2, true)}</div>
+        <div className="keyboard-row">{renderKeys(keysRow3, true)}</div>
+        <div className="keyboard-row">{renderKeys(keysRow4, true)}</div>
+        <div className="keyboard-row">{renderKeys(spaceKey)}</div>
       </div>
     );
   };
@@ -229,7 +298,7 @@ const AdvanceTypingTest = () => {
     >
       {showSettings ? (
         <>
-          <header className="text-center mb-10 mt-6">
+          <header className="text-center mb-7 mt-6">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Advanced Typing Test Tool
             </h1>
@@ -239,36 +308,46 @@ const AdvanceTypingTest = () => {
             </p>
           </header>
           <div className="flex items-center justify-center text-gray-900">
-            <div className="settings w-full max-w-lg p-8 bg-white shadow-lg rounded-lg">
-              <h2 className="text-3xl font-bold mb-6 text-center">
-                Typing Game Settings
+            <div className="settings w-full max-w-lg p-6 bg-white shadow-xl rounded-xl">
+              <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-800">
+                Settings
               </h2>
-              <div className="mb-4">
-                <label className="block mb-2 text-lg">Select Language:</label>
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value as Language)}
-                  className="w-full p-3 rounded bg-gray-200 text-gray-900"
-                >
-                  <option value="english">English</option>
-                  <option value="pashto">Pashto</option>
-                </select>
+              <div className="mb-6">
+                <label className="block mb-2 text-lg font-semibold text-gray-700">
+                  Select Language:
+                </label>
+                <div className="relative">
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as Language)}
+                    className="w-full p-3 rounded-xl bg-gray-100 text-gray-900 border-2 border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
+                  >
+                    <option value="english">English</option>
+                    <option value="pashto">Pashto</option>
+                  </select>
+                </div>
               </div>
-              <div className="mb-4">
-                <label className="block mb-2 text-lg">Select Difficulty:</label>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                  className="w-full p-3 rounded bg-gray-200 text-gray-900"
-                >
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
+              <div className="mb-6">
+                <label className="block mb-2 text-lg font-semibold text-gray-700">
+                  Select Difficulty:
+                </label>
+                <div className="relative">
+                  <select
+                    value={difficulty}
+                    onChange={(e) =>
+                      setDifficulty(e.target.value as Difficulty)
+                    }
+                    className="w-full p-3 rounded-xl bg-gray-100 text-gray-900 border-2 border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
+                  >
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
               </div>
               <button
                 onClick={startGame}
-                className="w-full p-4 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
+                className="w-full p-4 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700 transition duration-300"
               >
                 Start Game
               </button>
@@ -279,45 +358,65 @@ const AdvanceTypingTest = () => {
         <>
           {isCompleted && <Confetti width={width} height={height} />}
           <div
-            className="bg-white shadow-lg mt-6 rounded-lg p-4 w-full max-w-6xl overflow-auto transition-all duration-300"
+            className="bg-white shadow-lg mt-6 rounded-lg p-2 w-full max-w-6xl overflow-auto transition-all duration-300"
             style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
           >
-            <div className="text-2xl flex flex-wrap font-mono leading-relaxed">
+            <div className="text-area text-2xl font-bold font-sans leading-relaxed">
               {renderText()}
             </div>
           </div>
 
-          <input
-            type="text"
-            value={input}
-            onChange={handleChange}
-            className="mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono"
-            placeholder={
-              language === "pashto"
-                ? "دلته لیکل پیل کړئ..."
-                : "Start typing here..."
-            }
-            ref={inputRef}
-            autoFocus
-            disabled={isCompleted}
+          <div
+            className="w-full max-w-4xl mx-auto"
             style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
-          />
-
-          <div className="w-full max-w-4xl h-2 bg-gray-300 rounded mt-2">
-            <div
-              className="h-full bg-blue-600 rounded"
-              style={{ width: `${(wordIndex / words.length) * 100}%` }}
-            ></div>
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={handleChange}
+              className="mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono"
+              placeholder={
+                language === "pashto"
+                  ? "دلته لیکل پیل کړئ..."
+                  : "Start typing here..."
+              }
+              ref={inputRef}
+              autoFocus
+              disabled={isCompleted}
+              style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
+            />
+            <div className="w-full max-w-4xl h-2 bg-gray-300 rounded mt-2">
+              <div
+                className="h-full bg-blue-600 rounded"
+                style={{ width: `${(wordIndex / words.length) * 100}%` }}
+              ></div>
+            </div>
           </div>
 
           {renderKeyboard()}
 
-          <div className="mt-10 w-full max-w-5xl text-lg">
-            <div className="flex justify-between">
-              <p>Time: {timer}s</p>
-              <p>WPM: {wpm}</p>
-              <p>Accuracy: {accuracy.toFixed(2)}%</p>
-              <p>Errors: {errors}</p>
+          <div className="mt-10 w-full max-w-5xl">
+            <div className="status-bar grid grid-cols-4 gap-3 p-1 bg-white shadow-lg rounded-lg">
+              <div className="status-item">
+                <span className="status-icon">⏱</span>
+                <p className="status-label">Time:</p>
+                <p className="status-value">{timer}s</p>
+              </div>
+              <div className="status-item">
+                <span className="status-icon">⌨️</span>
+                <p className="status-label">WPM:</p>
+                <p className="status-value">{wpm}</p>
+              </div>
+              <div className="status-item">
+                <span className="status-icon">🎯</span>
+                <p className="status-label">Accuracy:</p>
+                <p className="status-value">{accuracy.toFixed(2)}%</p>
+              </div>
+              <div className="status-item">
+                <span className="status-icon">❌</span>
+                <p className="status-label">Errors:</p>
+                <p className="status-value">{errors}</p>
+              </div>
             </div>
           </div>
 

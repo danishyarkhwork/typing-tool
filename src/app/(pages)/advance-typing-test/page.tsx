@@ -12,10 +12,8 @@ const TypingSpeedAI = () => {
   return (
     <>
       <section className="bg-gradient-to-b from-blue-100 via-slate-200 to-white text-gray-900 min-h-screen flex flex-col items-center pt-20 pb-12">
-        <div className="container mx-auto px-4">
-          <div className="w-full max-w-4xl mx-auto">
-            <AdvanceTypingTest />
-          </div>
+        <div className="max-w-6xl">
+          <AdvanceTypingTest />
         </div>
       </section>
     </>

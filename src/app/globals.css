@@ -21,3 +21,318 @@
 .install-button {
   @apply mt-4 px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-700;
 }
+.blinking-cursor {
+  font-weight: 100;
+  font-size: 24px;
+  color: black;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Container and Rows */
+.keyboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+  user-select: none;
+  max-width: 100%;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Key Styles */
+.key {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  margin: 0.3rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(145deg, #3b3b3b, #5b5b5b);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3), 0px 0px 15px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.key::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+.key:hover::after {
+  opacity: 0.3;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.special-key {
+  padding: 0.75rem 3rem; /* Wider keys */
+  background: linear-gradient(145deg, #1c1c1c, #3a3a3a);
+  color: #ffffff;
+}
+
+.space-key {
+  padding: 0.75rem 8rem; /* Smaller space bar width */
+  background: linear-gradient(145deg, #292929, #474747);
+  color: #ffffff;
+}
+
+.default-key {
+  background: linear-gradient(145deg, #3b3b3b, #5b5b5b);
+}
+
+.active-key {
+  background: linear-gradient(145deg, #666666, #7a7a7a);
+  transform: translateY(-2px);
+}
+
+.next-key {
+  background: linear-gradient(145deg, #f1c40f, #e67e22);
+  animation: pulse 1.5s infinite;
+}
+
+/* Hover Effects */
+.key:hover {
+  background: linear-gradient(145deg, #666666, #7a7a7a);
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3), 0px 0px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Pulse Animation for Next Key */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .key {
+    padding: 0.5rem 1rem;
+    font-size: 1.2rem;
+  }
+
+  .special-key {
+    padding: 0.5rem 2rem;
+  }
+
+  .space-key {
+    padding: 0.5rem 10rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .key {
+    padding: 0.3rem 0.8rem;
+    font-size: 1rem;
+  }
+
+  .special-key {
+    padding: 0.3rem 1.5rem;
+  }
+
+  .space-key {
+    padding: 0.3rem 8rem;
+  }
+}
+
+.text-area {
+  width: 100%;
+  font-size: 1.6rem; /* Larger font size */
+  font-weight: bold; /* Bold text */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Clear, modern font */
+  color: #000000; /* Dark color for better contrast */
+  line-height: 1.5;
+  padding: 1rem;
+  text-align: justify;
+}
+
+.text-area span {
+  display: inline-block;
+  margin-right: 0.2rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+}
+
+.text-area span.bg-green-500 {
+  background-color: #28a745; /* Correct word background */
+  color: #ffffff;
+}
+
+.text-area span.bg-blue-500 {
+  background-color: #007bff; /* Current word background */
+  color: #ffffff;
+}
+
+.text-area span.text-gray-600 {
+  color: #6c757d; /* Future words color */
+}
+
+.status-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem; /* Reduced gap */
+  padding: 0.5rem; /* Further reduced padding */
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* Slightly reduced border-radius */
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.25rem; /* Further reduced padding */
+  background-color: #ffffff;
+  border-radius: 6px; /* Slightly reduced border-radius */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Reduced shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Adjusted hover shadow */
+}
+
+.status-icon {
+  font-size: 1rem; /* Further reduced icon size */
+  margin-bottom: 0.15rem; /* Further reduced margin */
+  color: #3498db; /* Primary color for icons */
+}
+
+.status-label {
+  font-size: 0.75rem; /* Further reduced label size */
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.status-value {
+  font-size: 0.95rem; /* Further reduced value size */
+  color: #343a40;
+  font-weight: bold;
+  margin-top: 0.1rem; /* Further reduced margin */
+}
+
+.settings {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 20px; /* More rounded corners */
+  padding: 2rem; /* Reduced padding for a compact design */
+}
+
+.settings h2 {
+  font-weight: 800;
+  color: #333333;
+}
+
+.settings label {
+  font-weight: 600;
+  color: #4a4a4a;
+}
+
+.settings select {
+  background-color: #f5f5f5;
+  border: 2px solid #d1d1d1;
+  border-radius: 15px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.settings select:focus {
+  border-color: #007bff;
+}
+
+.settings button {
+  background-color: #007bff;
+  color: #ffffff;
+  border-radius: 15px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 5px 10px rgba(0, 123, 255, 0.3);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.settings button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 8px 15px rgba(0, 123, 255, 0.4);
+}
+
+.settings select:focus,
+.settings button:hover {
+  outline: none;
+}
+
+.settings select {
+  padding-right: 2rem; /* Additional space for the arrow icon */
+}
+
+.settings .relative select + span {
+  pointer-events: none;
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: #999999;
+}
