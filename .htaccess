@@ -1,0 +1,9 @@
+Options +FollowSymLinks
+RewriteEngine On
+
+# Redirect all requests to index.html, except if the request is for an actual file or directory
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rewrite all other requests to index.html while preserving the requested URL
+RewriteRule ^(.*)$ /index.html [L,QSA]
