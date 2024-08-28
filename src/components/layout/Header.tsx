@@ -263,13 +263,23 @@ const Header = () => {
                 {activeDropdown === "coding" && (
                   <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-lg border p-2 w-48">
                     <div className="nav-item">
-                      <Link className="nav-link" href="/html-typing">
+                      <Link className="nav-link" href="/html-typing-test">
                         HTML
                       </Link>
                     </div>
                     <div className="nav-item">
-                      <Link className="nav-link" href="/css-typing">
+                      <Link className="nav-link" href="/css-typing-test">
                         CSS
+                      </Link>
+                    </div>
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/bootstrap-typing-test">
+                        Bootstrap
+                      </Link>
+                    </div>
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/tailwind-typing-test">
+                        Tailwind
                       </Link>
                     </div>
                   </div>
@@ -586,15 +596,25 @@ const Header = () => {
               {activeMobileDropdown === "coding" && (
                 <ul className="pl-4 mt-2 space-y-2">
                   <li>
-                    <Link className="nav-link" href="/html-typing">
+                    <Link className="nav-link" href="/html-typing-test">
                       HTML
                     </Link>
                   </li>
                   <li>
-                    <Link className="nav-link" href="/css-typing">
+                    <Link className="nav-link" href="/css-typing-test">
                       CSS
                     </Link>
                   </li>
+                  <div className="nav-item">
+                    <Link className="nav-link" href="/bootstrap-typing-test">
+                      Bootstrap
+                    </Link>
+                  </div>
+                  <div className="nav-item">
+                    <Link className="nav-link" href="/tailwind-typing-test">
+                      Tailwind
+                    </Link>
+                  </div>
                 </ul>
               )}
             </li>

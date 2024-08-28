@@ -1,0 +1,58 @@
+.instructions {
+  background-color: #f1f2f6;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #2c3e50;
+}
+
+.cm-focused .cm-line {
+  background-color: #f8f9fa;
+}
+
+.cm-focused .cm-cursor {
+  border-left-color: #27ae60;
+}
+
+.progress-bar {
+  background-color: #dcdde1;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 15px;
+  height: 12px;
+}
+
+.progress {
+  height: 12px;
+  background-color: #27ae60;
+  transition: width 0.3s ease;
+}
+
+.metrics {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f7fafc;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.metrics p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.congratulations {
+  background-color: #27ae60;
+  color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 30px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
