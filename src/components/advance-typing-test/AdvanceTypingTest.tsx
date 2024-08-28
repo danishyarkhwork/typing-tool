@@ -7,17 +7,19 @@ import { useWindowSize } from "react-use";
 
 const textSamples = {
   easy: {
-    english: "The cat sat on the mat.",
-    pashto: "پشۍ په توشک ناست و.",
+    english: "Jack fixed the broken TV quickly, surprising everyone.",
+    pashto:
+      "پلار خپل ماشوم ته يو کتاب ورکړ. دا کتاب ډېر ښه و او ماشوم په خوښۍ سره ولوست.",
   },
   medium: {
     english:
-      "Oil and water don't mix. You have probably heard this old saying.",
-    pashto: "تیل او اوبه یوځای نشي. تاسو به شاید دا زوړ خبره اورېدلې وي.",
+      "Jack quickly fixed the TV, surprising everyone. Zoe asked how he did it. He replied he knew, leaving her speechless.",
+    pashto:
+      "زما ورور په چټکۍ سره خپل کور پاک کړ. هغه ډېره هڅه وکړه، او کور یې په څو دقیقو کې روښانه او پاک شو.",
   },
   hard: {
-    english: `Oil and water don't mix. You have probably heard this old saying. It isn't just folk wisdom, however. It's chemistry. Another common expression, "like water off of a duck's back," illustrates the same basic principle.`,
-    pashto: `تیل او اوبه یوځای نشي. تاسو به شاید دا زوړ خبره اورېدلې وي. دا یوازې ولسي حکمت نه دی، بلکې دا کیمیا ده. بله عامه وینا، "لکه څنګه چې اوبه د وزې څخه د غوړېدلې شوې اوبه،" ورته اساسي اصول څرګندوي.`,
+    english: `Jack amazed everyone by quickly fixing the broken TV. Zoe, however, couldn’t believe it; she asked, 'How did you manage that?' His simple reply, 'I just knew what to do,' left her speechless.`,
+    pashto: `د کتابونو په بازار کې، ډېر خلک راغلي وو. هر کس د خپل خوښې کتاب لټوه، او پلورونکی په مسکا سره خلکو ته هر کتاب وړاندې کاوه.`,
   },
 };
 
