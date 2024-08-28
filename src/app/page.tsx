@@ -73,7 +73,7 @@ export default function Home() {
                       height={16}
                     />
                     <p className="text-base">
-                      Aligned to Federal and State Standards
+                      Master your typing skills with our advanced Typing Tests!
                     </p>
                   </li>
                   <li className="flex items-start">
@@ -85,7 +85,7 @@ export default function Home() {
                       height={16}
                     />
                     <p className="text-base">
-                      Prepares Students for Standardized Testing
+                      Challenge your speed and accuracy with our Typing Games!
                     </p>
                   </li>
                   <li className="flex items-start">
@@ -97,7 +97,7 @@ export default function Home() {
                       height={16}
                     />
                     <p className="text-base">
-                      Powerful District and Classroom Management
+                      Sharpen your coding skills with Typing Code practice!
                     </p>
                   </li>
                 </ul>
@@ -196,7 +196,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-blue-800 mb-12 leading-tight">
             Go Beyond Typing with <br className="hidden lg:block" />
-            Digital Citizenship, Coding, and Career Prep
+            Coding, and Typing Games
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10">
@@ -208,8 +208,8 @@ export default function Home() {
               },
               {
                 src: "assets/images/features/feature2.svg",
-                alt: "Computer Basics & Tech Literacy",
-                text: "Computer Basics & Tech Literacy",
+                alt: "Advance Typing Tests",
+                text: "Advance Typing Tests",
               },
               {
                 src: "assets/images/features/feature3.svg",
@@ -223,13 +223,13 @@ export default function Home() {
               },
               {
                 src: "assets/images/features/feature5.svg",
-                alt: "Career Prep & Professionalism",
-                text: "Career Prep & Professionalism",
+                alt: "Advance Typing Games",
+                text: "Advance Typing Games",
               },
               {
                 src: "assets/images/features/feature6.svg",
-                alt: "English, Spanish, & Portuguese",
-                text: "English, Spanish, & Portuguese",
+                alt: "English & Pashto Languages",
+                text: "English & Pashto Languages",
               },
             ].map((feature, index) => (
               <div
