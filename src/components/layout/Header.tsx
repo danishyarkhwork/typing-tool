@@ -282,6 +282,11 @@ const Header = () => {
                         Tailwind
                       </Link>
                     </div>
+                    <div className="nav-item">
+                      <Link className="nav-link" href="/javascript-typing-test">
+                        JavaScript
+                      </Link>
+                    </div>
                   </div>
                 )}
               </li>
@@ -613,6 +618,11 @@ const Header = () => {
                   <div className="nav-item">
                     <Link className="nav-link" href="/tailwind-typing-test">
                       Tailwind
+                    </Link>
+                  </div>
+                  <div className="nav-item">
+                    <Link className="nav-link" href="/javascript-typing-test">
+                      JavaScript
                     </Link>
                   </div>
                 </ul>
