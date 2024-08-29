@@ -13,7 +13,7 @@ export const htmlSteps = [
   {
     level: 1,
     instruction: "Step 3: Add a hyperlink that opens in a new tab.",
-    code: '<a href="https://www.example.com" target="_blank">Visit Example</a>',
+    code: '<a href="https://www.asantyping.com" target="_blank">Visit Example</a>',
   },
   {
     level: 1,
@@ -47,7 +47,7 @@ export const htmlSteps = [
   {
     level: 2,
     instruction: "Step 9: Add a blockquote with citation information.",
-    code: '<blockquote cite="https://www.example.com">\n  This is a blockquote from Example.\n</blockquote>',
+    code: '<blockquote cite="https://www.asantyping.com">\n  This is a blockquote from Asan Typing.\n</blockquote>',
   },
   {
     level: 2,
