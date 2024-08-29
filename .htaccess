@@ -1,9 +1,15 @@
 Options +FollowSymLinks
 RewriteEngine On
 
-# Redirect all requests to index.html, except if the request is for an actual file or directory
+# Allow direct access to files and directories
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Rewrite all other requests to index.html while preserving the requested URL
-RewriteRule ^(.*)$ /index.html [L,QSA]
+# If the request is not for an actual file or directory,
+# rewrite the request to the Next.js app's entry point (index.html)
+RewriteRule ^ /index.html [L,QSA]
+
+# Handle pushState by routing requests to the Next.js router
+RewriteCond %{REQUEST_URI} !^/api/  # Adjust this if you have any API routes you want to exclude
+RewriteCond %{REQUEST_URI} !^/static/  # Adjust this if you have any static files you want to exclude
+RewriteRule ^.*$ - [PT]
