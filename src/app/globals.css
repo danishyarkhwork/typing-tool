@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.b-zar {
+  font-family: "Bahij Badr";
+  src: url("/public/assets/fonts/b-zar/BhijZar-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
 @keyframes blink {
   0% {
     opacity: 1;
