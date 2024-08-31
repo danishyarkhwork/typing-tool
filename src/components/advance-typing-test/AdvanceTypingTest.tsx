@@ -361,12 +361,12 @@ const AdvanceTypingTest = () => {
           {isCompleted && <Confetti width={width} height={height} />}
           <div
             className={`bg-white shadow-lg mt-6 rounded-lg p-2 w-full max-w-6xl overflow-auto transition-all duration-300
-            ${language === "pashto" ? "b-zar" : ""}`}
+            ${language === "pashto" ? "f-b-zar" : ""}`}
             style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
           >
             <div
               className={`text-area text-2xl font-bold font-sans leading-relaxed ${
-                language === "pashto" ? "b-zar" : ""
+                language === "pashto" ? "f-b-zar" : ""
               }`}
             >
               {renderText()}
