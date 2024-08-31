@@ -2,9 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Bahij Zar";
+  src: url("/public/assets/fonts/b-zar/BahijZar-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
 .b-zar {
-  font-family: "Bahij Badr";
-  src: url("/public/assets/fonts/b-zar/BhijZar-Bold.ttf") format("truetype");
+  font-family: "Bahij Zar";
   font-weight: bold;
   font-style: normal;
 }

@@ -360,10 +360,15 @@ const AdvanceTypingTest = () => {
         <>
           {isCompleted && <Confetti width={width} height={height} />}
           <div
-            className="bg-white shadow-lg mt-6 rounded-lg p-2 w-full max-w-6xl overflow-auto transition-all duration-300"
+            className={`bg-white shadow-lg mt-6 rounded-lg p-2 w-full max-w-6xl overflow-auto transition-all duration-300
+            ${language === "pashto" ? "b-zar" : ""}`}
             style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
           >
-            <div className="text-area text-2xl font-bold font-sans leading-relaxed">
+            <div
+              className={`text-area text-2xl font-bold font-sans leading-relaxed ${
+                language === "pashto" ? "b-zar" : ""
+              }`}
+            >
               {renderText()}
             </div>
           </div>
@@ -376,7 +381,8 @@ const AdvanceTypingTest = () => {
               type="text"
               value={input}
               onChange={handleChange}
-              className="mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono"
+              className={`mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono
+                ${language === "pashto" ? "b-zar" : ""}`}
               placeholder={
                 language === "pashto"
                   ? "دلته لیکل پیل کړئ..."
