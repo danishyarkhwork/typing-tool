@@ -97,12 +97,19 @@ const JSTypingPractice: React.FC = () => {
       const iframeDocument =
         iframeRef.current.contentDocument ||
         iframeRef.current.contentWindow?.document;
+
       if (iframeDocument) {
         iframeDocument.open();
         iframeDocument.write(`
           <html>
             <body>
-              <script>${code}<\/script>
+              <script>
+                try {
+                  ${code}
+                } catch (error) {
+                  document.body.innerHTML = '<pre style="color: red;">' + error + '</pre>';
+                }
+              <\/script>
             </body>
           </html>
         `);
@@ -171,6 +178,9 @@ const JSTypingPractice: React.FC = () => {
         </div>
 
         <div className="mt-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Live Preview
+          </h2>
           <iframe
             ref={iframeRef}
             className="w-full p-3 h-40 border border-gray-300 rounded-md shadow-sm"
