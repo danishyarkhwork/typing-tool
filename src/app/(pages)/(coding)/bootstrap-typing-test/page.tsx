@@ -18,6 +18,7 @@ const BootstrapTypingPractice: React.FC = () => {
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const codeEditorRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null); // Reference to the iframe element
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load typing sound
@@ -50,6 +51,7 @@ const BootstrapTypingPractice: React.FC = () => {
     calculateProgress(value);
     calculateWpm(value);
     calculateAccuracy(value);
+    updateIframeContent(value); // Update the iframe content with the new Bootstrap HTML code
   };
 
   const calculateProgress = (newCode: string) => {
@@ -86,6 +88,28 @@ const BootstrapTypingPractice: React.FC = () => {
         if (document.exitFullscreen) {
           document.exitFullscreen();
         }
+      }
+    }
+  };
+
+  const updateIframeContent = (htmlCode: string) => {
+    if (iframeRef.current) {
+      const iframeDocument =
+        iframeRef.current.contentDocument ||
+        iframeRef.current.contentWindow?.document;
+      if (iframeDocument) {
+        iframeDocument.open();
+        iframeDocument.write(`
+          <html>
+            <head>
+              <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+            </head>
+            <body>
+              ${htmlCode}
+            </body>
+          </html>
+        `);
+        iframeDocument.close();
       }
     }
   };
@@ -147,6 +171,17 @@ const BootstrapTypingPractice: React.FC = () => {
               },
             })}
           />
+        </div>
+
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Live Preview
+          </h2>
+          <iframe
+            ref={iframeRef}
+            className="w-full p-3 h-40 border border-gray-300 rounded-md shadow-sm"
+            title="Live Preview"
+          ></iframe>
         </div>
 
         <ProgressBarBootstrap progress={progress} />
