@@ -3,13 +3,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import ProgressBarTailwind from "@/components/coding/tailwind/ProgressBar";
 import CodeMirror from "@uiw/react-codemirror";
+import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { EditorView } from "@codemirror/view";
 import InstructionsTailwind from "@/components/coding/tailwind/Instructions";
 import PerformanceMetricsTailwind from "@/components/coding/tailwind/PerformanceMetrics";
 import { tailwindSteps } from "@/data/tailwindContent";
 import useSound from "use-sound";
-import { autocompletion } from "@codemirror/autocomplete";
+import { autocompletion, closeBrackets } from "@codemirror/autocomplete";
 
 const TailwindTypingPractice: React.FC = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
@@ -107,9 +108,14 @@ const TailwindTypingPractice: React.FC = () => {
 
         iframeDocument.open();
         iframeDocument.write(`
-          ${tailwindCDN}
-          <style>${code}</style>
-          <div class="p-4">${code}</div>
+          <html>
+            <head>
+              ${tailwindCDN}
+            </head>
+            <body>
+              <div class="p-4">${code}</div>
+            </body>
+          </html>
         `);
         iframeDocument.close();
       }
@@ -144,7 +150,12 @@ const TailwindTypingPractice: React.FC = () => {
         <div className="bg-white rounded-lg p-3 shadow-md">
           <CodeMirror
             value={typedCode}
-            extensions={[css(), autocompletion()]}
+            extensions={[
+              html({ autoCloseTags: true }), // Enable auto close tags in HTML
+              css(),
+              autocompletion(),
+              closeBrackets(), // Enable auto closing of brackets
+            ]}
             onChange={(value) => handleCodeChange(value)}
             height="250px"
             theme={EditorView.theme({
@@ -176,6 +187,9 @@ const TailwindTypingPractice: React.FC = () => {
         </div>
 
         <div className="mt-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Live Preview
+          </h2>
           <iframe
             ref={iframeRef}
             className="w-full p-3 h-40 border border-gray-300 rounded-md shadow-sm"
