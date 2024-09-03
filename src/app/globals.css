@@ -2,17 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* styles/globals.css */
+
 @font-face {
   font-family: "b-zar";
-  src: url("/public/assets/fonts/b-zar/fonts/BahijZar-Bold.eot");
+  src: url("/assets/fonts/b-zar/BahijZar-Bold.eot");
   src: local("Bahij Zar Bold"), local("BahijZar-Bold"),
-    url("/public/assets/fonts/b-zar/BahijZar-Bold.eot?#iefix")
+    url("/assets/fonts/b-zar/BahijZar-Bold.eot?#iefix")
       format("embedded-opentype"),
-    url("/public/assets/fonts/b-zar/BahijZar-Bold.woff2") format("woff2"),
-    url("/public/assets/fonts/b-zar/BahijZar-Bold.woff") format("woff"),
-    url("/public/assets/fonts/b-zar/BahijZar-Bold.ttf") format("truetype"),
-    url("/public/assets/fonts/b-zar/BahijZar-Bold.svg#BahijZar-Bold")
-      format("svg");
+    url("/assets/fonts/b-zar/BahijZar-Bold.woff2") format("woff2"),
+    url("/assets/fonts/b-zar/BahijZar-Bold.woff") format("woff"),
+    url("/assets/fonts/b-zar/BahijZar-Bold.ttf") format("truetype"),
+    url("/assets/fonts/b-zar/BahijZar-Bold.svg#BahijZar-Bold") format("svg");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -20,6 +21,14 @@
 
 .f-b-zar {
   font-family: "b-zar";
+}
+
+.font-large {
+  font-size: 3rem;
+}
+
+.font-normal {
+  font-size: 1rem;
 }
 
 @keyframes blink {

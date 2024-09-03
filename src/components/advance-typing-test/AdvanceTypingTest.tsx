@@ -177,83 +177,27 @@ const AdvanceTypingTest = () => {
     setIsTyping(false);
   };
 
+  const pashtoKeyboard = {
+    row1: "ض ص ث ق ف غ ع ه خ ح ج چ".split(" "),
+    row2: "ش س ی ب ل ا ت ن م ک گ".split(" "),
+    row3: "ط ظ ز ژ ږ پ و ۍ د ر ذ".split(" "),
+  };
+
   const renderKeyboard = () => {
     if (!currentWord) return null;
 
     const nextChar = currentWord.charAt(input.length);
-    const isUpperCase = nextChar === nextChar.toUpperCase();
 
-    const keysRow1 = [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "0",
-      "-",
-      "=",
-      "Backspace",
-    ];
-    const keysRow2 = [
-      "Tab",
-      "Q",
-      "W",
-      "E",
-      "R",
-      "T",
-      "Y",
-      "U",
-      "I",
-      "O",
-      "P",
-      "[",
-      "]",
-      "\\",
-    ];
-    const keysRow3 = [
-      "Caps",
-      "A",
-      "S",
-      "D",
-      "F",
-      "G",
-      "H",
-      "J",
-      "K",
-      "L",
-      ";",
-      "'",
-      "Enter",
-    ];
-    const keysRow4 = [
-      "Shift",
-      "Z",
-      "X",
-      "C",
-      "V",
-      "B",
-      "N",
-      "M",
-      ",",
-      ".",
-      "/",
-      "Shift",
-    ];
-    const spaceKey = ["Space"]; // Representing the space bar
+    const renderKeys = (keys: string[]) => {
+      if (!keys || !Array.isArray(keys)) return null; // Safeguard against undefined or non-array keys
 
-    const renderKeys = (keys: any[], isSpecialRow = false) => {
       return keys.map((key) => {
-        const displayKey = isUpperCase ? key.toUpperCase() : key.toLowerCase();
-        const isActive = input.slice(-1).toUpperCase() === key.toUpperCase();
-        const isNextKey = nextChar.toUpperCase() === key.toUpperCase();
+        const isActive = input.slice(-1) === key;
+        const isNextKey = nextChar === key;
         const isSpecialKey = [
           "Backspace",
           "Tab",
-          "Caps Lock",
+          "CapsLock",
           "Enter",
           "Shift",
           "Space",
@@ -262,9 +206,6 @@ const AdvanceTypingTest = () => {
         let keyStyle = "key";
         if (isSpecialKey) {
           keyStyle += " special-key"; // Special styling for larger keys
-          if (key === "Space") {
-            keyStyle += " space-key"; // Smaller space bar
-          }
         }
 
         return (
@@ -274,27 +215,45 @@ const AdvanceTypingTest = () => {
               isActive ? "active-key" : ""
             }`}
           >
-            {displayKey}
+            {key}
           </span>
         );
       });
     };
 
-    return (
-      <div className="keyboard-container">
-        <div className="keyboard-row">{renderKeys(keysRow1)}</div>
-        <div className="keyboard-row">{renderKeys(keysRow2, true)}</div>
-        <div className="keyboard-row">{renderKeys(keysRow3, true)}</div>
-        <div className="keyboard-row">{renderKeys(keysRow4, true)}</div>
-        <div className="keyboard-row">{renderKeys(spaceKey)}</div>
-      </div>
-    );
+    if (language === "pashto") {
+      return (
+        <div className="keyboard-container">
+          <div className="keyboard-row">{renderKeys(pashtoKeyboard.row1)}</div>
+          <div className="keyboard-row">{renderKeys(pashtoKeyboard.row2)}</div>
+          <div className="keyboard-row">{renderKeys(pashtoKeyboard.row3)}</div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="keyboard-container">
+          <div className="keyboard-row">
+            {renderKeys("1 2 3 4 5 6 7 8 9 0 - = Backspace".split(" "))}
+          </div>
+          <div className="keyboard-row">
+            {renderKeys("Tab Q W E R T Y U I O P [ ] \\".split(" "))}
+          </div>
+          <div className="keyboard-row">
+            {renderKeys("Caps A S D F G H J K L ; ' Enter".split(" "))}
+          </div>
+          <div className="keyboard-row">
+            {renderKeys("Shift Z X C V B N M , . / Shift".split(" "))}
+          </div>
+          <div className="keyboard-row">{renderKeys("Space".split(" "))}</div>
+        </div>
+      );
+    }
   };
 
   return (
     <div
       className={`max-w-5xl flex flex-col justify-center text-gray-900 transition-all duration-300 ${
-        language === "pashto" ? "rtl" : ""
+        language === "pashto" ? "rtl f-b-zar" : ""
       }`}
       onClick={() => inputRef.current?.focus()}
     >
@@ -358,16 +317,22 @@ const AdvanceTypingTest = () => {
         </>
       ) : (
         <>
-          {isCompleted && <Confetti width={width} height={height} />}
           <div
-            className={`bg-white shadow-lg mt-6 rounded-lg p-2 w-full max-w-6xl overflow-auto transition-all duration-300
-            ${language === "pashto" ? "f-b-zar" : ""}`}
-            style={{ direction: language === "pashto" ? "rtl" : "ltr" }}
+            className={`bg-white shadow-lg mt-6 rounded-lg p-2 w-full max-w-6xl overflow-auto transition-all duration-300`}
+            style={{
+              direction: language === "pashto" ? "rtl" : "ltr",
+              fontFamily:
+                language === "pashto" ? "'b-zar', sans-serif" : "inherit",
+            }}
           >
             <div
-              className={`text-area text-2xl font-bold font-sans leading-relaxed ${
-                language === "pashto" ? "f-b-zar" : ""
+              className={`text-area font-bold leading-relaxed ${
+                language === "pashto" ? "f-b-zar font-large" : "font-large"
               }`}
+              style={{
+                fontFamily:
+                  language === "pashto" ? "'b-zar', sans-serif" : "inherit",
+              }}
             >
               {renderText()}
             </div>
@@ -382,7 +347,7 @@ const AdvanceTypingTest = () => {
               value={input}
               onChange={handleChange}
               className={`mt-4 p-4 text-2xl border-2 border-gray-300 text-black rounded-lg w-full max-w-4xl focus:outline-none transition-all duration-300 font-mono
-                ${language === "pashto" ? "b-zar" : ""}`}
+                ${language === "pashto" ? "f-b-zar" : ""}`}
               placeholder={
                 language === "pashto"
                   ? "دلته لیکل پیل کړئ..."
@@ -401,7 +366,17 @@ const AdvanceTypingTest = () => {
             </div>
           </div>
 
-          {renderKeyboard()}
+          <div
+            className={`font-bold leading-relaxed ${
+              language === "pashto" ? "f-b-zar font-large" : "font-large"
+            }`}
+            style={{
+              fontFamily:
+                language === "pashto" ? "'b-zar', sans-serif" : "inherit",
+            }}
+          >
+            {renderKeyboard()}
+          </div>
 
           <div className="mt-10 w-full max-w-5xl">
             <div className="status-bar grid grid-cols-4 gap-3 p-1 bg-white shadow-lg rounded-lg">
