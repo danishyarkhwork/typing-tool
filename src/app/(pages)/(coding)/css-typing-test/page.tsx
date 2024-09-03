@@ -18,6 +18,7 @@ const CSSTypingPractice: React.FC = () => {
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const codeEditorRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null); // Reference to the iframe element
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load typing sound
@@ -50,7 +51,7 @@ const CSSTypingPractice: React.FC = () => {
     calculateProgress(value);
     calculateWpm(value);
     calculateAccuracy(value);
-    updateIframeContent(value);
+    updateIframeContent(value); // Update the iframe content with the new CSS
   };
 
   const calculateProgress = (newCode: string) => {
@@ -87,6 +88,28 @@ const CSSTypingPractice: React.FC = () => {
         if (document.exitFullscreen) {
           document.exitFullscreen();
         }
+      }
+    }
+  };
+
+  const updateIframeContent = (cssCode: string) => {
+    if (iframeRef.current) {
+      const iframeDocument =
+        iframeRef.current.contentDocument ||
+        iframeRef.current.contentWindow?.document;
+      if (iframeDocument) {
+        iframeDocument.open();
+        iframeDocument.write(`
+          <html>
+            <head>
+              <style>${cssCode}</style>
+            </head>
+            <body>
+              <div class="preview-content">CSS Preview Area</div>
+            </body>
+          </html>
+        `);
+        iframeDocument.close();
       }
     }
   };
@@ -150,6 +173,17 @@ const CSSTypingPractice: React.FC = () => {
           />
         </div>
 
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Live Preview
+          </h2>
+          <iframe
+            ref={iframeRef}
+            className="w-full p-3 h-40 border border-gray-300 rounded-md shadow-sm"
+            title="Live Preview"
+          ></iframe>
+        </div>
+
         <ProgressBarCSS progress={progress} />
         <PerformanceMetricsCSS
           wpm={wpm}
@@ -167,6 +201,3 @@ const CSSTypingPractice: React.FC = () => {
 };
 
 export default CSSTypingPractice;
-function updateIframeContent(value: string) {
-  throw new Error("Function not implemented.");
-}
