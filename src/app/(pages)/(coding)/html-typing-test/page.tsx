@@ -22,7 +22,6 @@ const TypingPractice: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load typing sound
   const [playTypingSound] = useSound("assets/keypress.wav", { volume: 0.5 });
 
   useEffect(() => {
@@ -45,9 +44,7 @@ const TypingPractice: React.FC = () => {
   const currentStep = htmlSteps[currentStepIndex];
 
   const handleCodeChange = (value: string) => {
-    // Play typing sound on input change
     playTypingSound();
-
     setTypedCode(value);
     calculateProgress(value);
     calculateWpm(value);
@@ -68,7 +65,11 @@ const TypingPractice: React.FC = () => {
   const calculateWpm = (newCode: string) => {
     const words = newCode.split(/\s+/).filter((word) => word.length > 0).length;
     const minutes = timeElapsed / 60;
-    setWpm(Math.round(words / minutes));
+    if (minutes > 0) {
+      setWpm(Math.round(words / minutes));
+    } else {
+      setWpm(0);
+    }
   };
 
   const calculateAccuracy = (newCode: string) => {
@@ -134,7 +135,7 @@ const TypingPractice: React.FC = () => {
           <CodeMirror
             value={typedCode}
             extensions={[html()]}
-            onChange={(value) => handleCodeChange(value)}
+            onChange={handleCodeChange}
             height="250px"
             theme={EditorView.theme({
               "&": {

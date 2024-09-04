@@ -2,8 +2,21 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Modal from "react-modal";
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
-import { signIn, signOut, useSession } from "next-auth/react";
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaTimes,
+  FaBars,
+  FaChevronDown,
+} from "react-icons/fa";
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "@/firebaseConfig";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,7 +29,6 @@ const Header = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [signupForm, setSignupForm] = useState({
     name: "",
-    username: "",
     email: "",
     password: "",
     agreeToPrivacy: false,
@@ -25,9 +37,8 @@ const Header = () => {
     email: "",
     password: "",
   });
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -63,7 +74,6 @@ const Header = () => {
     setIsSignupModalOpen(false);
     setSignupForm({
       name: "",
-      username: "",
       email: "",
       password: "",
       agreeToPrivacy: false,
@@ -102,12 +112,13 @@ const Header = () => {
 
   const validateSignupForm = () => {
     let errors: { [key: string]: string } = {};
+
     if (!signupForm.name) errors.name = "Name is required";
-    if (!signupForm.username) errors.username = "Username is required";
     if (!signupForm.email) errors.email = "Email is required";
     if (!signupForm.password) errors.password = "Password is required";
     if (!signupForm.agreeToPrivacy)
       errors.agreeToPrivacy = "You must agree to the privacy policy";
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -116,21 +127,17 @@ const Header = () => {
     e.preventDefault();
     if (validateSignupForm()) {
       try {
-        const response = await fetch("/api/user/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(signupForm),
-        });
-        if (response.ok) {
-          closeSignupModal();
-        } else {
-          const errorData = await response.json();
-          setFormErrors({ server: errorData.message });
-        }
-      } catch (error) {
-        setFormErrors({ server: "An error occurred. Please try again." });
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          signupForm.email,
+          signupForm.password
+        );
+        const user = userCredential.user;
+        console.log("User signed up successfully:", user);
+        closeSignupModal();
+      } catch (error: any) {
+        console.error("Signup error:", error.message);
+        setFormErrors({ server: error.message });
       }
     }
   };
@@ -138,19 +145,17 @@ const Header = () => {
   const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: loginForm.email,
-        password: loginForm.password,
-      });
-
-      if (result?.error) {
-        setFormErrors({ server: result.error });
-      } else {
-        closeLoginModal();
-      }
-    } catch (error) {
-      setFormErrors({ server: "An error occurred. Please try again." });
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        loginForm.email,
+        loginForm.password
+      );
+      const user = userCredential.user;
+      console.log("User logged in successfully:", user);
+      closeLoginModal();
+    } catch (error: any) {
+      console.error("Login error:", error.message);
+      setFormErrors({ server: error.message });
     }
   };
 
@@ -298,6 +303,11 @@ const Header = () => {
               </li>
             </ul>
           </div>
+          {session ? (
+            <p>Welcome, {session.user?.name}</p>
+          ) : (
+            <p>Please sign in</p>
+          )}
 
           <div className="hidden lg:flex items-center space-x-4">
             {session ? (
@@ -375,59 +385,6 @@ const Header = () => {
                         </a>
                       </div>
 
-                      <div className="nav-item rounded hover:bg-gray-100 transition-all">
-                        <a className="nav-link flex items-center p-2" href="#">
-                          <svg
-                            className="h-5 w-5 text-gray-500 mr-3"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                          </svg>
-                          Settings
-                        </a>
-                      </div>
-
-                      <div className="nav-item rounded hover:bg-gray-100 transition-all">
-                        <a className="nav-link flex items-center p-2" href="#">
-                          <svg
-                            className="h-5 w-5 text-gray-500 mr-3"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line
-                              x1="14.31"
-                              y1="8"
-                              x2="20.05"
-                              y2="17.94"
-                            ></line>
-                            <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
-                            <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
-                            <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
-                            <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
-                            <line
-                              x1="16.62"
-                              y1="12"
-                              x2="10.88"
-                              y2="21.94"
-                            ></line>
-                          </svg>
-                          Support
-                        </a>
-                      </div>
-
                       <hr className="border-gray-200 my-2" />
 
                       <div className="nav-item rounded hover:bg-gray-100 transition-all">
@@ -487,12 +444,13 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-2xl text-gray-500"
             >
-              <i className="fa-solid fa-bars"></i>
+              <FaBars />
             </button>
           </div>
         </div>
       </header>
 
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div
           id="mobileMenu"
@@ -510,7 +468,7 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="text-2xl text-gray-500"
             >
-              <i className="fa-solid fa-xmark"></i>
+              <FaTimes />
             </button>
           </div>
           <ul className="flex flex-col space-y-4">
@@ -525,11 +483,11 @@ const Header = () => {
                 onClick={() => toggleMobileDropdown("typing")}
               >
                 Typing
-                <i
-                  className={`fa-solid fa-angle-down ${
+                <FaChevronDown
+                  className={`${
                     activeMobileDropdown === "typing" ? "rotate-180" : ""
                   } transition-transform`}
-                ></i>
+                />
               </button>
               {activeMobileDropdown === "typing" && (
                 <ul className="pl-4 mt-2 space-y-2">
@@ -560,11 +518,11 @@ const Header = () => {
                 onClick={() => toggleMobileDropdown("games")}
               >
                 Games
-                <i
-                  className={`fa-solid fa-angle-down ${
+                <FaChevronDown
+                  className={`${
                     activeMobileDropdown === "games" ? "rotate-180" : ""
                   } transition-transform`}
-                ></i>
+                />
               </button>
               {activeMobileDropdown === "games" && (
                 <ul className="pl-4 mt-2 space-y-2">
@@ -592,11 +550,11 @@ const Header = () => {
                 onClick={() => toggleMobileDropdown("coding")}
               >
                 Coding
-                <i
-                  className={`fa-solid fa-angle-down ${
+                <FaChevronDown
+                  className={`${
                     activeMobileDropdown === "coding" ? "rotate-180" : ""
                   } transition-transform`}
-                ></i>
+                />
               </button>
               {activeMobileDropdown === "coding" && (
                 <ul className="pl-4 mt-2 space-y-2">
@@ -664,81 +622,62 @@ const Header = () => {
         </div>
       )}
 
-      {/* <Modal
+      {/* Signup Modal */}
+      <Modal
         isOpen={isSignupModalOpen}
         onRequestClose={closeSignupModal}
         contentLabel="Sign Up"
         className="Modal"
         overlayClassName="Overlay"
       >
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Sign Up
-        </h2>
+        <h2 className="text-3xl font-bold mb-4">Sign Up</h2>
         <form onSubmit={handleSignupSubmit}>
           {formErrors.server && (
-            <div className="text-red-500 text-sm mb-4">{formErrors.server}</div>
+            <div className="text-red-500 mb-4">{formErrors.server}</div>
           )}
-          <div className="mb-4 flex items-center">
-            <FaUser className="mr-2 text-gray-500" />
+          <div className="mb-4">
+            <FaUser className="inline mr-2" />
             <input
               type="text"
               name="name"
               placeholder="Name"
               value={signupForm.name}
               onChange={handleSignupChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              className="w-full p-3 border rounded"
             />
+            {formErrors.name && (
+              <div className="text-red-500">{formErrors.name}</div>
+            )}
           </div>
-          {formErrors.name && (
-            <div className="text-red-500 text-sm mb-4">{formErrors.name}</div>
-          )}
-          <div className="mb-4 flex items-center">
-            <FaUser className="mr-2 text-gray-500" />
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={signupForm.username}
-              onChange={handleSignupChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-            />
-          </div>
-          {formErrors.username && (
-            <div className="text-red-500 text-sm mb-4">
-              {formErrors.username}
-            </div>
-          )}
-          <div className="mb-4 flex items-center">
-            <FaEnvelope className="mr-2 text-gray-500" />
+          <div className="mb-4">
+            <FaEnvelope className="inline mr-2" />
             <input
               type="email"
               name="email"
               placeholder="Email"
               value={signupForm.email}
               onChange={handleSignupChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              className="w-full p-3 border rounded"
             />
+            {formErrors.email && (
+              <div className="text-red-500">{formErrors.email}</div>
+            )}
           </div>
-          {formErrors.email && (
-            <div className="text-red-500 text-sm mb-4">{formErrors.email}</div>
-          )}
-          <div className="mb-4 flex items-center">
-            <FaLock className="mr-2 text-gray-500" />
+          <div className="mb-4">
+            <FaLock className="inline mr-2" />
             <input
               type="password"
               name="password"
               placeholder="Password"
               value={signupForm.password}
               onChange={handleSignupChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              className="w-full p-3 border rounded"
             />
+            {formErrors.password && (
+              <div className="text-red-500">{formErrors.password}</div>
+            )}
           </div>
-          {formErrors.password && (
-            <div className="text-red-500 text-sm mb-4">
-              {formErrors.password}
-            </div>
-          )}
-          <div className="mb-4 flex items-center">
+          <div className="mb-4">
             <input
               type="checkbox"
               name="agreeToPrivacy"
@@ -746,26 +685,22 @@ const Header = () => {
               onChange={handleSignupChange}
               className="mr-2"
             />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              I agree to the Privacy Policy
-            </span>
+            <label>I agree to the Privacy Policy</label>
+            {formErrors.agreeToPrivacy && (
+              <div className="text-red-500">{formErrors.agreeToPrivacy}</div>
+            )}
           </div>
-          {formErrors.agreeToPrivacy && (
-            <div className="text-red-500 text-sm mb-4">
-              {formErrors.agreeToPrivacy}
-            </div>
-          )}
-          <div className="flex justify-between mt-6">
+          <div className="flex justify-between">
             <button
               type="button"
               onClick={closeSignupModal}
-              className="p-3 bg-red-500 text-white rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+              className="p-3 bg-red-500 text-white rounded-lg shadow-md"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+              className="p-3 bg-blue-500 text-white rounded-lg shadow-md"
             >
               Sign Up
             </button>
@@ -773,6 +708,7 @@ const Header = () => {
         </form>
       </Modal>
 
+      {/* Login Modal */}
       <Modal
         isOpen={isLoginModalOpen}
         onRequestClose={closeLoginModal}
@@ -780,60 +716,56 @@ const Header = () => {
         className="Modal"
         overlayClassName="Overlay"
       >
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Login
-        </h2>
+        <h2 className="text-3xl font-bold mb-4">Login</h2>
         <form onSubmit={handleLoginSubmit}>
           {formErrors.server && (
-            <div className="text-red-500 text-sm mb-4">{formErrors.server}</div>
+            <div className="text-red-500 mb-4">{formErrors.server}</div>
           )}
-          <div className="mb-4 flex items-center">
-            <FaEnvelope className="mr-2 text-gray-500" />
+          <div className="mb-4">
+            <FaEnvelope className="inline mr-2" />
             <input
               type="email"
               name="email"
               placeholder="Email"
               value={loginForm.email}
               onChange={handleLoginChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              className="w-full p-3 border rounded"
             />
+            {formErrors.email && (
+              <div className="text-red-500">{formErrors.email}</div>
+            )}
           </div>
-          {formErrors.email && (
-            <div className="text-red-500 text-sm mb-4">{formErrors.email}</div>
-          )}
-          <div className="mb-4 flex items-center">
-            <FaLock className="mr-2 text-gray-500" />
+          <div className="mb-4">
+            <FaLock className="inline mr-2" />
             <input
               type="password"
               name="password"
               placeholder="Password"
               value={loginForm.password}
               onChange={handleLoginChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              className="w-full p-3 border rounded"
             />
+            {formErrors.password && (
+              <div className="text-red-500">{formErrors.password}</div>
+            )}
           </div>
-          {formErrors.password && (
-            <div className="text-red-500 text-sm mb-4">
-              {formErrors.password}
-            </div>
-          )}
-          <div className="flex justify-between mt-6">
+          <div className="flex justify-between">
             <button
               type="button"
               onClick={closeLoginModal}
-              className="p-3 bg-red-500 text-white rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+              className="p-3 bg-red-500 text-white rounded-lg shadow-md"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="p-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+              className="p-3 bg-blue-500 text-white rounded-lg shadow-md"
             >
               Login
             </button>
           </div>
         </form>
-      </Modal> */}
+      </Modal>
 
       <style jsx global>{`
         .Modal {

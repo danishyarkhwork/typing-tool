@@ -8,5 +8,8 @@ const config = withPWA({
 
 export default {
   ...config,
-  output: "export",
+  swcMinify: true, // You can enable minification
+  compiler: {
+    styledComponents: true,
+  },
 };
